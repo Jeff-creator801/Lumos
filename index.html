@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lumos — быстрый поиск</title>
+<meta name="description" content="Lumos — лёгкий мобильный поисковик" />
+
+<!-- Простая стилизация -->
+<style>
+  :root{
+    --bg:#0f1720;
+    --card:#0b1220;
+    --accent:#7c5cff;
+    --muted:#9aa6b2;
+    --glass: rgba(255,255,255,0.03);
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+  body{
+    background: linear-gradient(180deg,#07102a, #071831 60%);
+    color:#e6eef6;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+  }
+  .wrap{
+    width:100%;
+    max-width:840px;
+    border-radius:16px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.03));
+    box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+    padding:22px;
+    backdrop-filter: blur(6px);
+  }
+  header{display:flex;gap:12px;align-items:center;margin-bottom:18px;}
+  .logo{
+    width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#4bb6ff);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:white;box-shadow: 0 6px 18px rgba(124,92,255,0.18);
+  }
+  h1{margin:0;font-size:20px;}
+  p.lead{margin:0;color:var(--muted);font-size:13px;}
+  .search-row{display:flex;gap:8px;margin-top:16px;}
+  input.search{
+    flex:1;padding:14px 14px;border-radius:12px;border:0;background:var(--glass);color:inherit;font-size:16px;outline:none;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+  }
+  button.btn{
+    background:linear-gradient(180deg,var(--accent), #5d3cff);border:0;color:white;padding:12px 16px;border-radius:12px;font-weight:600;
+    box-shadow: 0 6px 18px rgba(124,92,255,0.18);
+  }
+  main{margin-top:18px;}
+  .result-card{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));padding:14px;border-radius:10px;}
+  .instant{font-size:15px;color:#dfe9ff;margin-bottom:8px;}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:6px;}
+  .links{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .link-btn{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:8px;color:var(--muted);font-size:13px;text-decoration:none;}
+  .footer{margin-top:14px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center;}
+  @media(max-width:520px){
+    .wrap{padding:14px}
+    .logo{width:46px;height:46px;font-size:18px}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap" role="main">
+    <header>
+      <div class="logo" aria-hidden>Lu</div>
+      <div>
+        <h1>Lumos</h1>
+        <p class="lead">Быстрый мобильный поисковик — в браузере, готов к установке</p>
+      </div>
+    </header>
+
+    <section class="search-row" aria-label="Поиск">
+      <input id="q" class="search" placeholder="Введите запрос..." autocomplete="off" />
+      <button id="go" class="btn">Искать</button>
+    </section>
+
+    <main>
+      <div id="status" style="margin-top:12px;color:var(--muted);font-size:14px">Готов к поиску</div>
+      <div id="output" style="margin-top:12px"></div>
+    </main>
+
+    <div class="footer">
+      <div>© Lumos</div>
+      <div><small class="meta">Можно установить как приложение</small></div>
+    </div>
+  </div>
+
+<!-- Скрипт: JSONP + fallback на результаты поисковых систем -->
+<script>
+(function(){
+  const qInput = document.getElementById('q');
+  const goBtn = document.getElementById('go');
+  const out = document.getElementById('output');
+  const status = document.getElementById('status');
+
+  function safeText(s){
+    const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+  }
+
+  // Рендер карточки результата
+  function renderInstant(data, query){
+    out.innerHTML = '';
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    // DuckDuckGo Instant Answer structure: Heading, AbstractText, AbstractURL, RelatedTopics
+    const heading = data.Heading || (data.AbstractText ? query : '');
+    if(heading){
+      const h = document.createElement('div'); h.className='instant'; h.innerHTML = safeText(heading);
+      card.appendChild(h);
+    }
+    if(data.AbstractText){
+      const a = document.createElement('div'); a.className='meta'; a.innerHTML = safeText(data.AbstractText);
+      card.appendChild(a);
+    }
+    // Add source link if present
+    if(data.AbstractURL){
+      const s = document.createElement('div'); s.style.marginTop='8px';
+      s.innerHTML = `<a class="link-btn" target="_blank" rel="noopener" href="${safeText(data.AbstractURL)}">Открыть источник</a>`;
+      card.appendChild(s);
+    }
+    // Related topics (first few)
+    if(Array.isArray(data.RelatedTopics) && data.RelatedTopics.length){
+      const list = document.createElement('div'); list.style.marginTop='8px';
+      data.RelatedTopics.slice(0,5).forEach(t=>{
+        if(t.Text && t.FirstURL){
+          const a = document.createElement('a');
+          a.className='link-btn'; a.style.display='inline-block'; a.style.margin='4px 6px 0 0';
+          a.href = t.FirstURL; a.target='_blank'; a.rel='noopener';
+          a.textContent = t.Text;
+          list.appendChild(a);
+        } else if(t.Topics){
+          t.Topics.slice(0,3).forEach(inner=>{
+            if(inner.Text && inner.FirstURL){
+              const a = document.createElement('a');
+              a.className='link-btn'; a.style.display='inline-block'; a.style.margin='4px 6px 0 0';
+              a.href = inner.FirstURL; a.target='_blank'; a.rel='noopener';
+              a.textContent = inner.Text;
+              list.appendChild(a);
+            }
+          });
+        }
+      });
+      card.appendChild(list);
+    }
+
+    // Fallback links — открыть полный поиск
+    const links = document.createElement('div'); links.className='links';
+    const qEnc = encodeURIComponent(query);
+    const dd = document.createElement('a'); dd.className='link-btn'; dd.href=`https://duckduckgo.com/?q=${qEnc}`; dd.target='_blank'; dd.rel='noopener'; dd.textContent='DuckDuckGo';
+    const gg = document.createElement('a'); gg.className='link-btn'; gg.href=`https://www.google.com/search?q=${qEnc}`; gg.target='_blank'; gg.rel='noopener'; gg.textContent='Google';
+    const bg = document.createElement('a'); bg.className='link-btn'; bg.href=`https://www.bing.com/search?q=${qEnc}`; bg.target='_blank'; bg.rel='noopener'; bg.textContent='Bing';
+    links.appendChild(dd); links.appendChild(gg); links.appendChild(bg);
+    card.appendChild(links);
+
+    out.appendChild(card);
+  }
+
+  // JSONP fetch to DuckDuckGo Instant Answer API
+  function duckJSONP(query, cb, timeout = 7000){
+    const callbackName = 'dd_cb_' + Math.floor(Math.random()*1e9);
+    const script = document.createElement('script');
+    const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1&callback=${callbackName}`;
+    let timer = setTimeout(()=>{
+      cleanup();
+      cb(new Error('timeout'));
+    }, timeout);
+
+    window[callbackName] = function(data){
+      clearTimeout(timer);
+      cleanup();
+      try{ cb(null, data); }catch(e){}
+    };
+    script.src = url;
+    script.onerror = function(){
+      clearTimeout(timer);
+      cleanup();
+      cb(new Error('network'));
+    };
+    function cleanup(){
+      try{ delete window[callbackName]; }catch(e){}
+      if(script && script.parentNode) script.parentNode.removeChild(script);
+    }
+    document.head.appendChild(script);
+  }
+
+  function doSearch(query){
+    if(!query || !query.trim()) return;
+    const q = query.trim();
+    status.textContent = 'Ищем → ' + q;
+    out.innerHTML = '';
+    // Показываем минимальную карточку ожидания
+    const wait = document.createElement('div'); wait.className='result-card'; wait.textContent = 'Ищем быстрый ответ...';
+    out.appendChild(wait);
+
+    // Попробуем JSONP Instant Answer
+    duckJSONP(q, (err, data) => {
+      if(err || !data){
+        // fallback: покажем ссылки
+        status.textContent = 'Быстрый ответ не найден, откройте результаты';
+        out.innerHTML = '';
+        const card = document.createElement('div'); card.className='result-card';
+        card.innerHTML = `<div class="meta">Быстрый ответ недоступен.</div>`;
+        const links = document.createElement('div'); links.className='links';
+        const qEnc = encodeURIComponent(q);
+        links.innerHTML = `<a class="link-btn" target="_blank" rel="noopener" href="https://duckduckgo.com/?q=${qEnc}">DuckDuckGo</a>
+                           <a class="link-btn" target="_blank" rel="noopener" href="https://www.google.com/search?q=${qEnc}">Google</a>
+                           <a class="link-btn" target="_blank" rel="noopener" href="https://www.bing.com/search?q=${qEnc}">Bing</a>`;
+        card.appendChild(links);
+        out.appendChild(card);
+      }else{
+        status.textContent = 'Готово';
+        renderInstant(data, q);
+      }
+    });
+  }
+
+  // Enter key
+  qInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){ doSearch(qInput.value); }
+  });
+
+  goBtn.addEventListener('click', ()=> doSearch(qInput.value));
+
+  // small UX: focus input on load
+  setTimeout(()=> qInput.focus(), 300);
+
+  // PWA install hint (if supported)
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const installBtn = document.createElement('button');
+    installBtn.className = 'btn'; installBtn.style.marginTop='12px';
+    installBtn.textContent = 'Установить Lumos';
+    installBtn.onclick = async () => {
+      if(!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.remove();
+    };
+    document.querySelector('.wrap').appendChild(installBtn);
+  });
+
+})();
+</script>
+</body>
+</html>
