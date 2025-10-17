@@ -8,7 +8,7 @@
   "description": "Lumos — быстрый мобильный поисковик",
   "icons": [
     {
-      "src": "icons/icon-512.png",
+      "src": "https://github.com/Jeff-creator801/Lumos/blob/main/icons/icon-512-1.png",
       "sizes": "512x512",
       "type": "image/png"
     }
