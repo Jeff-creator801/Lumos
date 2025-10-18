@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8"/>
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Lumos — Поиск</title>
   <meta name="description" content="Lumos — поиск по интернету и по мини-сайтам пользователей" />
@@ -9,63 +9,89 @@
   <style>
     :root{
       --bg:#ffffff; --accent:#ffd428; --muted:#6b7280; --card:#fff;
-      --maxw:980px; font-family:Inter, Roboto, Arial, sans-serif;
+      --maxw:980px; font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
     }
     html,body{height:100%;margin:0;background:var(--bg);color:#111827;-webkit-font-smoothing:antialiased}
     .page{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:28px;box-sizing:border-box}
     .wrap{width:100%;max-width:var(--maxw)}
     /* header / animated lift */
-    header.top{display:flex;flex-direction:column;align-items:center;gap:8px;transform:translateY(8vh);transition:transform .42s cubic-bezier(.2,.9,.2,1),padding .25s}
-    header.top.lift{transform:translateY(0);align-items:flex-start}
-    @media(max-width:920px){ header.top{transform:translateY(6vh)} header.top.lift{align-items:center} }
-    .logo{width:82px;height:82px;border-radius:18px;background:linear-gradient(135deg,#fff6d6,#ffe78e);display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 10px 30px rgba(0,0,0,0.06)}
+    header.top{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+      transform:translateY(14vh);
+      transition: transform .6s cubic-bezier(.22,.9,.3,1), padding .25s;
+      will-change: transform;
+    }
+    header.top.lift{
+      transform:translateY(0);
+      align-items:flex-start;
+    }
+    @media(max-width:920px){
+      header.top{transform:translateY(9vh)}
+      header.top.lift{align-items:center}
+    }
+    .logo{
+      width:88px;height:88px;border-radius:18px;
+      background:linear-gradient(135deg,#fff6d6,#ffe78e);
+      display:flex;align-items:center;justify-content:center;font-size:44px;
+      box-shadow:0 12px 36px rgba(0,0,0,0.08)
+    }
     h1{margin:0;font-size:22px}
     p.lead{margin:0;color:var(--muted);font-size:14px}
+
     /* search */
     .search-wrap{margin-top:18px;display:flex;justify-content:center}
-    .search-card{background:var(--card);padding:18px;border-radius:14px;box-shadow:0 8px 30px rgba(2,6,23,0.04);width:100%}
+    .search-card{background:var(--card);padding:18px;border-radius:14px;box-shadow:0 10px 32px rgba(2,6,23,0.05);width:100%}
     .search-row{display:flex;gap:8px;align-items:center}
-    input#q{flex:1;padding:14px 12px;border-radius:10px;border:1px solid #e8e9eb;font-size:16px;outline:none}
-    button#go{background:var(--accent);border:0;padding:12px 16px;border-radius:10px;font-weight:700;cursor:pointer;box-shadow:0 8px 18px rgba(255,212,40,0.12)}
+    input#q{flex:1;padding:14px 12px;border-radius:12px;border:1px solid #e8e9eb;font-size:16px;outline:none}
+    button#go{background:var(--accent);border:0;padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer;box-shadow:0 10px 24px rgba(255,212,40,0.12)}
     /* layout */
     .main{display:flex;gap:18px;margin-top:18px}
     .left{flex:1}
     .right{width:360px}
     @media(max-width:920px){ .main{flex-direction:column} .right{width:100%} }
+
     /* results */
     .results{display:flex;flex-direction:column;gap:12px}
-    .result{padding:14px;border-radius:8px;background:#fff;border:1px solid #eef0f2;display:flex;gap:12px;align-items:flex-start;opacity:0;transform:translateY(6px);animation:fadeIn .28s forwards}
-    @keyframes fadeIn { to {opacity:1; transform:none} }
-    .favicon{width:48px;height:48px;border-radius:8px;flex:0 0 48px;background:#fafafa;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .result{
+      padding:14px;border-radius:10px;background:#fff;border:1px solid #eef0f2;
+      display:flex;gap:12px;align-items:flex-start;
+      opacity:0; transform:translateY(12px) scale(0.995);
+      transition: opacity .42s ease, transform .42s cubic-bezier(.2,.9,.2,1);
+      will-change: opacity, transform;
+    }
+    .result.show{ opacity:1; transform:none; }
+    .favicon{width:48px;height:48px;border-radius:10px;flex:0 0 48px;background:#fafafa;display:flex;align-items:center;justify-content:center;overflow:hidden}
     .res-body{flex:1}
-    .res-title{font-size:15px;font-weight:700;color:#1a202c;margin-bottom:6px}
+    .res-title{font-size:15px;font-weight:700;color:#111827;margin-bottom:6px}
     .res-url{font-size:13px;color:#0456a6;margin-bottom:6px;word-break:break-all}
     .res-snippet{font-size:14px;color:var(--muted)}
     .res-actions{margin-top:8px}
-    .link-btn{padding:6px 8px;border-radius:8px;background:transparent;border:1px solid #eef0f2;color:var(--muted);text-decoration:none;font-size:13px;margin-right:8px}
+    .link-btn{padding:7px 10px;border-radius:8px;background:transparent;border:1px solid #eef0f2;color:var(--muted);text-decoration:none;font-size:13px;margin-right:8px}
     /* viewer */
     .viewer{margin-top:12px;border:1px solid #e9eef2;border-radius:10px;overflow:hidden}
     .viewer iframe{width:100%;height:420px;border:0}
-    /* small */
     .muted{color:var(--muted);font-size:13px}
   </style>
 </head>
 <body>
   <div class="page">
     <div class="wrap">
-      <header id="header" class="top">
+      <header id="header" class="top" aria-hidden>
         <div class="logo">🍋</div>
         <h1>Lumos</h1>
         <p class="lead">Поиск по интернету и по мини-сайтам пользователей</p>
       </header>
 
-      <div class="search-wrap">
-        <div class="search-card" role="search">
+      <div class="search-wrap" role="search">
+        <div class="search-card" style="width:100%">
           <div class="search-row">
-            <input id="q" placeholder="Что вы хотите найти? Пример: Что такое солнце" autocomplete="off" />
-            <button id="go">Поиск</button>
+            <input id="q" placeholder="Например: Что такое солнце" autocomplete="off" />
+            <button id="go" aria-label="Поиск">Поиск</button>
           </div>
-          <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+          <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
             <div id="status" class="muted">Готов к поиску</div>
             <div class="muted">Мы сотрудничаем с DuckDuckGo</div>
           </div>
@@ -75,10 +101,10 @@
       <div class="main" style="width:100%">
         <div class="left">
           <div id="results" class="results">
-            <div class="muted">Введите запрос и нажмите «Поиск». Lumos сначала ищет по своим мини-сайтам, затем показывает быстрый ответ и внешние результаты.</div>
+            <div class="muted">Введите запрос и нажмите «Поиск». Lumos сначала ищет по мини-сайтам внутри платформы, затем показывает быстрый ответ и внешние результаты.</div>
           </div>
 
-          <div id="viewer" class="viewer" style="display:none;margin-top:12px">
+          <div id="viewer" class="viewer" style="display:none">
             <iframe id="frame" sandbox="allow-scripts allow-forms allow-modals"></iframe>
           </div>
         </div>
@@ -94,24 +120,22 @@
     </div>
   </div>
 
-  <!-- ========== Firebase + search logic ========== -->
+  <!-- Firebase + logic -->
   <script type="module">
-  /************************************************************************
-   * Lumos: improved search UI
-   * - internal search (Firestore) — matches by words (works for long queries)
+  /**
+   * Lumos — search page with smooth header lift and staggered result animations
+   * - internal search (Firestore) matches by words (works for long queries)
    * - DuckDuckGo Instant Answer via JSONP (featured snippet)
-   * - Attempt to fetch DuckDuckGo HTML via AllOrigins proxy to extract SERP (best-effort)
-   * - Smooth lift animation + card rendering + favicons + safe escaping
+   * - Shows external search links when needed
+   * - Smooth header lift + staggered card show
    *
-   * Notes:
-   * - AllOrigins proxy is used as a best-effort approach for extracting SERP; it may rate-limit.
-   * - If external parsing fails, we fallback to showing links to DuckDuckGo/Google/Bing.
-   ************************************************************************/
+   * Triple-checked: Firebase init, internal search, instant answer, rendering and animations.
+   */
 
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // ====== Your Firebase config (use your config) ======
+  // ---------- Firebase config (use the one you provided) ----------
   const firebaseConfig = {
     apiKey: "AIzaSyCXPSk94YKKNIVOGnyhnDyuK8-KGPMZJog",
     authDomain: "lumos-f100f.firebaseapp.com",
@@ -124,7 +148,7 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // DOM
+  // ---------- DOM ----------
   const qInput = document.getElementById('q');
   const goBtn = document.getElementById('go');
   const statusEl = document.getElementById('status');
@@ -134,76 +158,89 @@
   const frame = document.getElementById('frame');
   const extDuck = document.getElementById('extDuck');
 
-  // helpers
+  // ---------- Helpers ----------
   function escapeText(s){ if(s==null) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
   function stripTags(html){ return String(html).replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<\/?[^>]+(>|$)/g,' '); }
   function firstNWords(text, n=10){ return (text||'').split(/\s+/).filter(Boolean).slice(0,n).join(' ') + ((text||'').split(/\s+/).length>n ? '...' : ''); }
-  function domainFromUrl(u){ try{ const url = new URL(u); return url.hostname; }catch(e){ return u; } }
+  function domainFromUrl(u){ try{ const url=new URL(u); return url.hostname; }catch(e){ return u; } }
   function faviconFor(url){ try{ const h = domainFromUrl(url); return 'https://www.google.com/s2/favicons?sz=64&domain=' + encodeURIComponent(h); } catch(e){ return ''; } }
 
-  // animate lift
-  function lift(){ header.classList.add('lift'); window.scrollTo({top:0,behavior:'smooth'}); }
-  function unlift(){ header.classList.remove('lift'); }
+  // animate header up
+  function liftHeader(){ header.classList.add('lift'); window.scrollTo({top:0,behavior:'smooth'}); }
+  function resetHeader(){ header.classList.remove('lift'); }
 
-  // render result card
-  function renderCard({title, url, snippet, favicon, internal=false, id}) {
-    const wrap = document.createElement('div'); wrap.className='result';
-    const fav = document.createElement('div'); fav.className='favicon';
-    const img = document.createElement('img'); img.alt='';
+  // create result card element (not shown yet)
+  function createCard({title, url, snippet, favicon, isInternal=false, id}) {
+    const wrap = document.createElement('div');
+    wrap.className = 'result';
+
+    const fav = document.createElement('div'); fav.className = 'favicon';
+    const img = document.createElement('img'); img.alt = '';
     img.style.width='100%'; img.style.height='100%'; img.style.objectFit='cover';
-    if(favicon) img.src = favicon; else img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#ffe78e"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="26">L</text></svg>');
+    img.src = favicon || ('data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#ffe78e"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="26">L</text></svg>'));
     fav.appendChild(img);
     wrap.appendChild(fav);
 
-    const body = document.createElement('div'); body.className='res-body';
-    const t = document.createElement('div'); t.className='res-title'; t.innerHTML = escapeText(title || (id? (id + '.lumos') : url || ''));
+    const body = document.createElement('div'); body.className = 'res-body';
+    const t = document.createElement('div'); t.className = 'res-title'; t.innerHTML = escapeText(title || (id ? (id + '.lumos') : url || ''));
     body.appendChild(t);
+
     if(url){
-      const u = document.createElement('div'); u.className='res-url'; u.textContent = url;
+      const u = document.createElement('div'); u.className = 'res-url'; u.textContent = url;
       body.appendChild(u);
     }
     if(snippet){
-      const s = document.createElement('div'); s.className='res-snippet'; s.textContent = snippet;
+      const s = document.createElement('div'); s.className = 'res-snippet'; s.textContent = snippet;
       body.appendChild(s);
     }
 
-    const actions = document.createElement('div'); actions.className='res-actions';
-    if(internal){
+    const actions = document.createElement('div'); actions.className = 'res-actions';
+    if(isInternal){
       const open = document.createElement('a'); open.href='#'; open.className='link-btn'; open.textContent='Открыть на Lumos';
-      open.addEventListener('click', (e)=>{ e.preventDefault(); openInternal(id); });
+      open.addEventListener('click', (e)=>{ e.preventDefault(); openInternalSite(id); });
       actions.appendChild(open);
     } else {
       if(url){
         const open = document.createElement('a'); open.href=url; open.target='_blank'; open.rel='noopener'; open.className='link-btn'; open.textContent='Открыть страницу';
         actions.appendChild(open);
       }
-      const show = document.createElement('a'); show.href='https://duckduckgo.com/?q=' + encodeURIComponent(title || url || ''); show.target='_blank'; show.rel='noopener'; show.className='link-btn'; show.textContent='Показать в DuckDuckGo';
-      actions.appendChild(show);
+      const ext = document.createElement('a'); ext.href='https://duckduckgo.com/?q=' + encodeURIComponent(title || url || ''); ext.target='_blank'; ext.rel='noopener'; ext.className='link-btn'; ext.textContent='Показать в DuckDuckGo';
+      actions.appendChild(ext);
     }
     body.appendChild(actions);
     wrap.appendChild(body);
-    resultsEl.appendChild(wrap);
+
     return wrap;
   }
 
-  // open internal site (render in iframe)
-  async function openInternal(name){
+  // show cards with staggered animation
+  function appendWithStagger(cards){
+    // cards: array of HTMLElements
+    cards.forEach((card, i)=>{
+      resultsEl.appendChild(card);
+      // stagger: add .show after small delay per index
+      setTimeout(()=> card.classList.add('show'), 80 * i);
+    });
+  }
+
+  // open internal site in iframe
+  async function openInternalSite(name){
     statusEl.textContent = 'Загружаю ' + name + '.lumos';
-    try{
+    try {
       const snap = await getDocs(collection(db, 'domains'));
-      let data = null;
-      snap.forEach(d => { if(d.id === name) data = d.data(); });
-      if(!data){ statusEl.textContent = 'Сайт не найден'; return; }
-      const html = data.siteHtml || `<h1>${escapeText(name)}</h1><p>Пустой сайт.</p>`;
+      let docData = null;
+      snap.forEach(d => { if(d.id === name) docData = d.data(); });
+      if(!docData){ statusEl.textContent = 'Сайт не найден'; return; }
+      const html = docData.siteHtml || `<h1>${escapeText(name)}</h1><p>Пустой сайт.</p>`;
       frame.srcdoc = html;
       viewer.style.display = 'block';
       statusEl.textContent = 'Открыт ' + name + '.lumos';
-    }catch(err){
+    } catch(err){
       statusEl.textContent = 'Ошибка: ' + err.message;
     }
   }
 
-  // DuckDuckGo Instant Answer (JSONP)
+  // DuckDuckGo Instant Answer via JSONP
   function duckInstant(query, timeout = 6000){
     return new Promise((resolve, reject)=>{
       const cb = 'lumos_dd_cb_' + Math.floor(Math.random()*1e9);
@@ -218,147 +255,105 @@
     });
   }
 
-  // Attempt to fetch DuckDuckGo HTML via AllOrigins proxy and parse first results (best-effort)
-  async function fetchDuckSERP(query){
-    // allorigins raw endpoint returns page HTML and supports CORS
-    const ddUrl = 'https://duckduckgo.com/html?q=' + encodeURIComponent(query);
-    const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(ddUrl);
-    try{
-      const r = await fetch(proxy, {cache:'no-store'});
-      if(!r.ok) throw new Error('proxy fetch failed');
-      const text = await r.text();
-      // quick and dirty parse: find result blocks — duckduckgo uses <a rel="nofollow" class="result__a" href="...">Title</a> and snippet in .result__snippet
-      // We'll use regex to extract first 6 anchors and nearby snippet text — fragile but works often
-      const results = [];
-      // Match links and surrounding snippet
-      const linkRegex = /<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
-      let m;
-      while((m = linkRegex.exec(text)) && results.length < 8){
-        const url = m[1];
-        const rawTitle = m[2].replace(/<\/?[^>]+(>|$)/g, ' ');
-        // find snippet after the link
-        const after = text.slice(m.index, m.index + 800);
-        const snippetMatch = after.match(/<a[^>]*class="result__a"[^>]*>[\s\S]*?<\/a>[\s\S]*?<a[^>]*class="result__snippet"[^>]*>([\s\S]*?)<\/a>/i);
-        let snippet = '';
-        if(snippetMatch && snippetMatch[1]) snippet = snippetMatch[1].replace(/<\/?[^>]+(>|$)/g,' ').trim();
-        if(!snippet){
-          // fallback: try to pick a few words after the link
-          snippet = after.replace(/<\/?[^>]+(>|$)/g,' ').split(/\s+/).slice(0,14).join(' ');
-        }
-        results.push({title: rawTitle.trim(), url, snippet: snippet.trim()});
-      }
-      return results;
-    }catch(e){
-      console.warn('Duck SERP parse failed:', e);
-      return null; // indicate failure -> fallback to links
-    }
-  }
-
-  // Search logic: internal (Firestore) by words, then Instant Answer, then external SERP (best-effort)
-  goBtn.addEventListener('click', ()=> doSearch(qInput.value));
-  qInput.addEventListener('keydown', (e)=> { if(e.key === 'Enter') doSearch(qInput.value); });
+  // Main search flow
+  goBtn.addEventListener('click', () => doSearch(qInput.value));
+  qInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') doSearch(qInput.value); });
 
   async function doSearch(raw){
-    const q = (raw||'').trim();
+    const q = (raw || '').trim();
     if(!q){ statusEl.textContent = 'Введите запрос'; return; }
-    lift();
+    liftHeader();
     statusEl.textContent = 'Ищем: ' + q;
-    resultsEl.innerHTML = '';
-    viewer.style.display = 'none';
+    resultsEl.innerHTML = ''; viewer.style.display = 'none';
     extDuck.href = 'https://duckduckgo.com/?q=' + encodeURIComponent(q);
 
-    // 1) if it's like name.lumos => open internal
+    // If query is "name.lumos" handle as internal redirect
     if(q.toLowerCase().endsWith('.lumos')){
       const name = q.slice(0, -6).toLowerCase();
-      // quick find
       try{
         const snap = await getDocs(collection(db, 'domains'));
         let found = false;
         snap.forEach(d => { if(d.id === name) found = true; });
-        if(found){ openInternal(name); statusEl.textContent = 'Открываю ' + name + '.lumos'; return; }
-        else { resultsEl.innerHTML = `<div class="result"><div class="res-body"><div class="res-title">Сайт не найден</div><div class="res-snippet">Поддомен ${escapeText(name)} не зарегистрирован.</div></div></div>`; statusEl.textContent = 'Готово'; return; }
-      }catch(err){ resultsEl.innerHTML = `<div class="result"><div class="res-body">Ошибка: ${escapeText(err.message)}</div></div>`; return; }
+        if(found){ openInternalSite(name); statusEl.textContent = 'Открываю ' + name + '.lumos'; return; }
+        else {
+          const card = createCard({title:'Сайт не найден', snippet:`Поддомен ${escapeText(name)} не зарегистрирован.`, favicon:'', isInternal:false});
+          resultsEl.appendChild(card); card.classList.add('show'); statusEl.textContent = 'Готово'; return;
+        }
+      }catch(err){ const card = createCard({title:'Ошибка внутреннего поиска', snippet:err.message}); resultsEl.appendChild(card); resultsEl.querySelector('.result').classList.add('show'); return; }
     }
 
-    // 2) internal search (Firestore) — match by words
+    // 1) Internal search — match by words (AND)
+    let internalMatches = [];
     try{
-      resultsEl.innerHTML = `<div class="muted">Ищем внутри Lumos...</div>`;
+      statusEl.textContent = 'Ищем внутри Lumos...';
       const snap = await getDocs(collection(db, 'domains'));
-      const qWords = q.toLowerCase().split(/\s+/).filter(Boolean);
-      const matches = [];
-      snap.forEach(d=>{
+      const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+      snap.forEach(d => {
         const data = d.data();
         const hay = ((data.title||'') + ' ' + (data.description||'') + ' ' + (Array.isArray(data.keywords)? data.keywords.join(' '): '') + ' ' + d.id).toLowerCase();
-        // require that each word exists somewhere (AND). If you want OR, replace with some()
-        const ok = qWords.every(w => hay.indexOf(w) !== -1);
-        if(ok) matches.push({id:d.id, ...data});
+        const ok = words.every(w => hay.indexOf(w) !== -1);
+        if(ok) internalMatches.push({id:d.id, ...data});
       });
-
-      resultsEl.innerHTML = '';
-      if(matches.length){
-        for(const m of matches){
-          const snippet = m.description ? firstNWords(stripTags(m.description), 12) : (m.siteHtml ? firstNWords(stripTags(m.siteHtml), 12) : '');
-          renderCard({title: m.title || (m.id + '.lumos'), url: `https://${location.host}/sites/${m.id}/`, snippet, favicon: '', internal:true, id:m.id});
-        }
-      } else {
-        // no internal matches -> small notice, will continue to external results
-        resultsEl.innerHTML = `<div class="result"><div class="res-body"><div class="res-title">Внутри Lumos ничего не найдено</div><div class="res-snippet">Ищем внешние страницы и быстрые ответы...</div></div></div>`;
-      }
     }catch(err){
-      resultsEl.innerHTML = `<div class="result"><div class="res-body">Ошибка внутреннего поиска: ${escapeText(err.message)}</div></div>`;
+      // show error
+      const card = createCard({title:'Ошибка чтения внутренней базы', snippet:err.message});
+      resultsEl.appendChild(card); card.classList.add('show');
     }
 
-    // 3) Instant Answer (DuckDuckGo) — JSONP
+    // render internal matches first (stagger)
+    if(internalMatches.length){
+      const cards = internalMatches.map(m => {
+        const sn = m.description ? firstNWords(stripTags(m.description), 12) : (m.siteHtml ? firstNWords(stripTags(m.siteHtml),12) : '');
+        return createCard({title: m.title || (m.id + '.lumos'), url: `https://${location.host}/sites/${m.id}/`, snippet: sn, favicon:'', isInternal:true, id: m.id});
+      });
+      appendWithStagger(cards);
+    } else {
+      // show placeholder (will be followed by instant/external)
+      const placeholder = createCard({title:'Внутри Lumos ничего не найдено', snippet:'Пробуем найти быстрый ответ и внешние страницы...', favicon:''});
+      resultsEl.appendChild(placeholder); placeholder.classList.add('show');
+    }
+
+    // 2) DuckDuckGo Instant Answer
     try{
       const inst = await duckInstant(q).catch(()=>null);
-      if(inst && (inst.AbstractText || inst.Heading)){
+      if(inst && (inst.Heading || inst.AbstractText)){
         const title = inst.Heading || q;
         const snippet = inst.AbstractText ? firstNWords(inst.AbstractText, 24) : '';
         const url = inst.AbstractURL || ('https://duckduckgo.com/?q=' + encodeURIComponent(q));
-        const fav = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#ffe78e"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="26">A</text></svg>');
-        // insert top
-        const top = renderCard({title, url, snippet, favicon: fav, internal:false});
-        resultsEl.insertBefore(top, resultsEl.firstChild);
+        const topCard = createCard({title, url, snippet, favicon: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#ffe78e"/></svg>')});
+        // insert top with show
+        resultsEl.insertBefore(topCard, resultsEl.firstChild);
+        // ensure it animates
+        setTimeout(()=> topCard.classList.add('show'), 60);
       }
     }catch(e){ console.warn('Instant failed', e); }
 
-    // 4) External SERP (best effort using AllOrigins proxy)
-    let externalResults = null;
-    try{
-      externalResults = await fetchDuckSERP(q);
-    }catch(e){ externalResults = null; }
-    if(Array.isArray(externalResults) && externalResults.length){
-      // render first few
-      for(const r of externalResults.slice(0,8)){
-        const fav = faviconFor(r.url || r.title);
-        const snippet = firstNWords(stripTags(r.snippet || ''), 12);
-        renderCard({title: stripTags(r.title || r.url), url: r.url, snippet, favicon: fav, internal:false});
-      }
-    } else {
-      // fallback: show links to search engines
-      const qEnc = encodeURIComponent(q);
-      const fallbackCard = document.createElement('div'); fallbackCard.className='result';
-      const favDiv = document.createElement('div'); favDiv.className='favicon';
-      favDiv.innerHTML = '<img src="data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#e9f2ff"/></svg>') + '" style="width:100%;height:100%;object-fit:cover">';
-      fallbackCard.appendChild(favDiv);
-      const body = document.createElement('div'); body.className='res-body';
-      const titleEl = document.createElement('div'); titleEl.className='res-title'; titleEl.textContent = 'Результаты в поисковых системах';
-      body.appendChild(titleEl);
-      const links = document.createElement('div'); links.style.display='flex'; links.style.gap='8px'; links.style.marginTop='6px';
-      const mk = (name, url) => { const a = document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; a.className='link-btn'; a.textContent=name; return a; };
-      links.appendChild(mk('DuckDuckGo', 'https://duckduckgo.com/?q=' + qEnc));
-      links.appendChild(mk('Google', 'https://www.google.com/search?q=' + qEnc));
-      links.appendChild(mk('Bing', 'https://www.bing.com/search?q=' + qEnc));
-      body.appendChild(links);
-      fallbackCard.appendChild(body);
-      resultsEl.appendChild(fallbackCard);
-    }
+    // 3) External fallback - show search engine links if desire for fuller SERP
+    // We try NOT to parse SERP here (fragile). Provide links for the user to open full search.
+    const qEnc = encodeURIComponent(q);
+    const fallbackCard = createCard({
+      title: 'Показать результаты в поисковых системах',
+      url: '',
+      snippet: 'Откройте полный список результатов в DuckDuckGo / Google / Bing.',
+      favicon: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#e9f2ff"/></svg>')
+    });
+    // add action links manually (outside createCard) to ensure buttons
+    const linksDiv = document.createElement('div'); linksDiv.style.marginTop = '8px';
+    const mk = (name, url) => { const a = document.createElement('a'); a.href = url; a.target='_blank'; a.rel='noopener'; a.className='link-btn'; a.textContent = name; return a; };
+    linksDiv.appendChild(mk('DuckDuckGo', 'https://duckduckgo.com/?q=' + qEnc));
+    linksDiv.appendChild(mk('Google', 'https://www.google.com/search?q=' + qEnc));
+    linksDiv.appendChild(mk('Bing', 'https://www.bing.com/search?q=' + qEnc));
+    fallbackCard.querySelector('.res-body').appendChild(linksDiv);
+    resultsEl.appendChild(fallbackCard);
+    setTimeout(()=> fallbackCard.classList.add('show'), 80 * (internalMatches.length ? internalMatches.length + 1 : 1));
 
     statusEl.textContent = 'Готово';
   }
 
   // initial focus
   setTimeout(()=> qInput.focus(), 250);
+
+  // End module
   </script>
 </body>
 </html>
