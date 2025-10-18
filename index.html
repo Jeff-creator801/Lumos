@@ -3,218 +3,101 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lumos — Поиск и мини-сайты</title>
-  <meta name="description" content="Lumos — быстрый мобильный поисковик + мини-сайты пользователей" />
+  <title>Lumos — Поиск</title>
+  <meta name="description" content="Lumos — поиск + мини-сайты" />
   <meta name="theme-color" content="#ffffff">
   <style>
-    /* ====== Стиль согласно требованиям: белый фон, лимон сверху, кнопка жёлтая ====== */
     :root{
-      --bg: #ffffff;
-      --accent: #ffd428; /* жёлтая кнопка */
-      --muted: #6b7280;
-      --card: #ffffff;
-      --radius: 12px;
-      --maxw: 920px;
+      --bg:#ffffff; --accent:#ffd428; --muted:#6b7280; --card:#fff; --maxw:980px;
       font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
     }
-    html,body{height:100%;margin:0;background:var(--bg);color:#111827;-webkit-font-smoothing:antialiased;}
-    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px;box-sizing:border-box;}
-    .container{width:100%;max-width:var(--maxw);display:flex;flex-direction:column;align-items:center;gap:18px}
-    header{display:flex;flex-direction:column;align-items:center;gap:6px}
-    .logo{width:88px;height:88px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fff6d6,#ffe78e);font-size:44px;box-shadow:0 8px 30px rgba(0,0,0,0.06)}
+    html,body{height:100%;margin:0;background:var(--bg);color:#111827}
+    .page{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:28px;box-sizing:border-box}
+    .wrap{width:100%;max-width:var(--maxw)}
+    /* header */
+    header.top{display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .28s ease}
+    header.top.small{align-items:flex-start;padding-top:6px}
+    .logo{width:82px;height:82px;border-radius:18px;background:linear-gradient(135deg,#fff6d6,#ffe78e);display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 10px 30px rgba(0,0,0,0.06)}
     h1{margin:0;font-size:22px}
     p.lead{margin:0;color:var(--muted);font-size:14px}
-    /* Search card */
-    .card{width:100%;background:var(--card);border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(2,6,23,0.04);box-sizing:border-box}
+    /* search */
+    .search-wrap{margin-top:18px;display:flex;justify-content:center}
+    .search-card{background:var(--card);padding:18px;border-radius:14px;box-shadow:0 8px 30px rgba(2,6,23,0.04);width:100%}
     .search-row{display:flex;gap:8px;align-items:center}
-    input.search{flex:1;padding:14px 12px;border-radius:12px;border:1px solid #e6e7eb;font-size:16px;outline:none}
-    button.btn{background:var(--accent);border:0;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer;color:#000;box-shadow:0 8px 18px rgba(255,212,40,0.12)}
-    .muted{color:var(--muted);font-size:13px}
-    main.sections{display:grid;grid-template-columns:1fr 360px;gap:18px;width:100%}
-    @media(max-width:920px){ main.sections{grid-template-columns:1fr} }
-    /* results */
+    input#q{flex:1;padding:14px 12px;border-radius:10px;border:1px solid #e8e9eb;font-size:16px;outline:none}
+    button#go{background:var(--accent);border:0;padding:12px 16px;border-radius:10px;font-weight:700;cursor:pointer;box-shadow:0 8px 18px rgba(255,212,40,0.12)}
+    /* layout results */
+    .main{display:flex;gap:18px;margin-top:18px}
+    .left{flex:1}
+    .right{width:360px}
+    @media(max-width:920px){ .main{flex-direction:column}.right{width:100%} header.top.small{align-items:center} }
+    /* result card like Google */
     .results{display:flex;flex-direction:column;gap:12px}
-    .result-item{padding:12px;border-radius:10px;border:1px solid #f0f0f0;background:#fbfbfb}
-    .result-title{font-weight:700;margin-bottom:6px}
-    .result-desc{color:var(--muted);font-size:13px}
-    /* sidebar */
-    .sidebar{display:flex;flex-direction:column;gap:12px}
-    .panel{padding:12px;border-radius:12px;border:1px solid #f0f0f0;background:#fff}
-    label{display:block;font-size:13px;margin-bottom:6px;color:#374151}
-    input.small, textarea.small, select.small{width:100%;padding:8px;border:1px solid #e6e7eb;border-radius:8px;font-size:14px}
-    textarea.small{min-height:120px}
-    .tiny{font-size:12px;color:var(--muted)}
-    .actions{display:flex;gap:8px;flex-wrap:wrap}
-    .link-btn{padding:8px 10px;border-radius:8px;background:transparent;border:1px solid #eef0f2;color:var(--muted);text-decoration:none}
-    /* viewer */
-    .viewer{width:100%;min-height:360px;border-radius:12px;border:1px solid #e9ecef;overflow:hidden}
-    .footer{margin-top:6px;color:var(--muted);font-size:13px;text-align:center}
+    .result{padding:14px;border-radius:8px;background:#fff;border:1px solid #eef0f2;display:flex;gap:12px;align-items:flex-start}
+    .favicon{width:48px;height:48px;border-radius:8px;flex:0 0 48px;background:#fafafa;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .res-body{flex:1}
+    .res-title{font-size:15px;font-weight:700;color:#1a202c;margin-bottom:6px}
+    .res-url{font-size:13px;color:#0456a6;margin-bottom:6px;word-break:break-all}
+    .res-snippet{font-size:14px;color:var(--muted)}
+    /* viewer iframe */
+    .viewer{margin-top:12px;border:1px solid #e9eef2;border-radius:10px;overflow:hidden}
+    .viewer iframe{width:100%;height:420px;border:0}
+    /* small */
+    .muted{color:var(--muted);font-size:13px}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="container">
-      <header>
-        <div class="logo" aria-hidden>🍋</div>
+  <div class="page">
+    <div class="wrap">
+      <header id="header" class="top">
+        <div class="logo">🍋</div>
         <h1>Lumos</h1>
-        <p class="lead">Быстрый мобильный поисковик — ищем в интернете и по мини-сайтам внутри Lumos</p>
+        <p class="lead">Поиск по интернету и по мини-сайтам пользователей</p>
       </header>
 
-      <div class="card" style="width:100%;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <div class="muted">Искать в Lumos</div>
-          <div class="muted tiny">Живой поиск · Mini-sites · PWA-ready</div>
-        </div>
-
-        <div class="search-row" style="margin-bottom:10px;">
-          <input id="q" class="search" placeholder="Введите запрос или site.lumos (например: hay.lumos)" />
-          <button id="go" class="btn">Поиск</button>
-        </div>
-
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div id="status" class="muted">Готов к поиску</div>
-          <div>
-            <button id="btn-login" class="link-btn">Войти / Регистрация</button>
-            <button id="btn-logout" class="link-btn" style="display:none">Выйти</button>
+      <div class="search-wrap">
+        <div class="search-card">
+          <div class="search-row">
+            <input id="q" placeholder="Что вы хотите найти? Например: Что такое солнце" />
+            <button id="go">Поиск</button>
+          </div>
+          <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+            <div id="status" class="muted">Готов к поиску</div>
+            <div class="muted">Мы сотрудничаем с DuckDuckGo</div>
           </div>
         </div>
       </div>
 
-      <main class="sections" style="width:100%;">
-        <!-- left: results / viewer -->
-        <section>
-          <div id="resultsWrap" class="results">
-            <div class="result-item">
-              <div class="result-title">Совет</div>
-              <div class="result-desc">Попробуй поискать «demo», или введите <code>yourname.lumos</code> чтобы перейти на мини-сайт (если он зарегистрирован).</div>
-            </div>
+      <div class="main">
+        <div class="left">
+          <div id="results" class="results">
+            <div class="muted">Введите запрос и нажмите «Поиск» — Lumos сначала ищет внутри своих мини-сайтов, затем показывает быстрый ответ и ссылки на внешние поисковики.</div>
           </div>
 
-          <div id="viewerWrap" style="margin-top:12px;display:none">
-            <div class="panel">
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <div><strong id="viewerTitle">Просмотр сайта</strong></div>
-                <div class="tiny" id="viewerMeta"></div>
-              </div>
-              <div class="viewer" style="margin-top:10px">
-                <iframe id="siteFrame" sandbox="allow-scripts allow-forms allow-modals" style="width:100%;height:420px;border:0"></iframe>
-              </div>
-            </div>
+          <div id="viewer" class="viewer" style="display:none;margin-top:12px">
+            <iframe id="frame" sandbox="allow-scripts allow-forms allow-modals"></iframe>
           </div>
-        </section>
+        </div>
 
-        <!-- right: sidebar with user panel -->
-        <aside class="sidebar">
-          <div class="panel" id="panelAuth">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div><strong>Панель аккаунта</strong></div>
-              <div id="userEmail" class="tiny"></div>
+        <aside class="right">
+          <div style="padding:12px;border-radius:10px;border:1px solid #eef0f2;background:#fff">
+            <div style="font-weight:700">Поддержка Lumos</div>
+            <div class="muted" style="margin-top:8px">Пользователи могут создавать мини-сайты через панель. Админ получает привилегии бесплатно.</div>
+            <div style="margin-top:12px">
+              <a id="duckLink" class="muted" href="#" target="_blank">Открыть в DuckDuckGo</a>
             </div>
-            <div id="authForms" style="margin-top:8px">
-              <div id="loggedOut">
-                <label>Почта</label>
-                <input id="email" class="small" type="email" placeholder="email@example.com" />
-                <label style="margin-top:8px">Пароль</label>
-                <input id="password" class="small" type="password" placeholder="минимум 6 символов" />
-                <div style="margin-top:8px;display:flex;gap:8px">
-                  <button id="btn-register" class="btn" style="padding:8px 12px">Регистрация</button>
-                  <button id="btn-signin" class="link-btn">Войти</button>
-                </div>
-              </div>
-              <div id="loggedIn" style="display:none;margin-top:8px">
-                <div class="tiny">В профиле:</div>
-                <div style="margin-top:6px">
-                  <button id="btn-createDomain" class="btn" style="padding:8px 12px">Создать поддомен</button>
-                </div>
-                <div style="margin-top:8px">
-                  <button id="btn-editSite" class="link-btn">Редактор сайта</button>
-                </div>
-                <div style="margin-top:8px">
-                  <button id="btn-mySites" class="link-btn">Мои сайты</button>
-                </div>
-              </div>
-            </div>
-            <div style="margin-top:10px">
-              <div class="tiny">Админ: <strong>alibahsburiev@gmail.com</strong> — бесплатное создание поддоменов.</div>
-            </div>
-          </div>
-
-          <!-- create domain panel -->
-          <div class="panel" id="panelCreate" style="display:none">
-            <div><strong>Создать / Зарезервировать поддомен</strong></div>
-            <label style="margin-top:8px">Желаемое имя (латинскими, без точки)</label>
-            <input id="domainName" class="small" placeholder="например: hay" />
-            <div class="tiny" style="margin-top:6px">После создания адрес будет выглядеть как <code>hay.lumos</code> — в Lumos это откроет мини-сайт.</div>
-            <div style="margin-top:8px;display:flex;gap:8px">
-              <button id="btn-doCreate" class="btn">Создать</button>
-              <button id="btn-cancelCreate" class="link-btn">Отмена</button>
-            </div>
-            <div id="createMsg" class="tiny" style="margin-top:8px;color:#b91c1c"></div>
-          </div>
-
-          <!-- site editor -->
-          <div class="panel" id="panelEditor" style="display:none">
-            <div><strong>Редактор сайта</strong></div>
-            <label style="margin-top:8px">Выбери свой поддомен</label>
-            <select id="selectMyDomains" class="small"></select>
-            <label style="margin-top:8px">Title</label>
-            <input id="siteTitle" class="small" />
-            <label style="margin-top:8px">Описание (description)</label>
-            <input id="siteDesc" class="small" />
-            <label style="margin-top:8px">Ключевые слова (через запятую)</label>
-            <input id="siteKeywords" class="small" />
-            <label style="margin-top:8px">HTML содержимое (index.html)</label>
-            <textarea id="siteHtml" class="small"></textarea>
-            <div style="margin-top:8px;display:flex;gap:8px">
-              <button id="btn-saveSite" class="btn">Сохранить</button>
-              <button id="btn-cancelEdit" class="link-btn">Закрыть</button>
-            </div>
-            <div id="editorMsg" class="tiny" style="margin-top:8px"></div>
-          </div>
-
-          <!-- my sites list -->
-          <div class="panel" id="panelMySites" style="display:none">
-            <div><strong>Мои сайты</strong></div>
-            <div id="mySitesList" style="margin-top:8px"></div>
-            <div style="margin-top:8px"><button id="btn-closeMySites" class="link-btn">Закрыть</button></div>
-          </div>
-
-          <div class="panel" id="panelBuy" >
-            <div><strong>Купить поддомен</strong></div>
-            <div class="tiny" style="margin-top:8px">Пока в прототипе покупки не подключены. Админ получает поддомены бесплатно. В будущем тут будет оплата через Telegram-бот или платёжный шлюз.</div>
           </div>
         </aside>
-      </main>
-
-      <div class="footer">Мы сотрудничаем с DuckDuckGo и другими сервисами.</div>
+      </div>
     </div>
   </div>
 
-  <!-- ========== Firebase + App logic ========== -->
+  <!-- Firebase + logic -->
   <script type="module">
-  /************************************************************************
-   * Lumos single-file app
-   * - uses Firebase (Auth + Firestore)
-   * - features:
-   *   * login/register (email/password)
-   *   * claim domain (stored in collection "domains")
-   *   * edit site content (stored in domains.doc.siteHtml, title, description, keywords)
-   *   * search internal domains and fallback to DuckDuckGo/Google/Bing
-   *   * viewer via iframe srcdoc
-   *
-   * Notes:
-   * - Admin email: alibahsburiev@gmail.com gets free creation rights.
-   * - This prototype stores site HTML in Firestore (good for prototyping).
-   * - To deploy to real filesystem (e.g. /sites/username/ on InfinityFree) you need server-side deployment or admin upload.
-   **************************************************************************/
-
-  // ---------- Firebase imports ----------
+  // ---------- Firebase initialization (your config) ----------
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, where, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
-
-  // ---------- Your Firebase config (you provided) ----------
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  // use only Firestore here (no auth required for search)
   const firebaseConfig = {
     apiKey: "AIzaSyCXPSk94YKKNIVOGnyhnDyuK8-KGPMZJog",
     authDomain: "lumos-f100f.firebaseapp.com",
@@ -224,404 +107,220 @@
     appId: "1:229952787613:web:b173816977d0301d5ef074",
     measurementId: "G-13QWTHDGH7"
   };
-
   const app = initializeApp(firebaseConfig);
-  // analytics optional
-  try { const analytics = getAnalytics(app); } catch(e){ /* ignore if not available */ }
-
-  const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // ---------- DOM elements ----------
+  // ---------- DOM ----------
   const qInput = document.getElementById('q');
   const goBtn = document.getElementById('go');
+  const resultsEl = document.getElementById('results');
+  const header = document.getElementById('header');
   const statusEl = document.getElementById('status');
-  const resultsWrap = document.getElementById('resultsWrap');
-  const viewerWrap = document.getElementById('viewerWrap');
-  const siteFrame = document.getElementById('siteFrame');
-  const viewerTitle = document.getElementById('viewerTitle');
-  const viewerMeta = document.getElementById('viewerMeta');
+  const viewer = document.getElementById('viewer');
+  const frame = document.getElementById('frame');
+  const duckLink = document.getElementById('duckLink');
 
-  const btnLogin = document.getElementById('btn-login');
-  const btnLogout = document.getElementById('btn-logout');
-  const btnRegister = document.getElementById('btn-register');
-  const btnSignin = document.getElementById('btn-signin');
+  // utils
+  function escapeText(s){ if(!s) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+  function domainFromUrl(u){ try{ const url=new URL(u); return url.hostname; }catch(e){ return u; } }
 
-  const emailInput = document.getElementById('email');
-  const passInput = document.getElementById('password');
-  const userEmailLabel = document.getElementById('userEmail');
-  const loggedOutPanel = document.getElementById('loggedOut');
-  const loggedInPanel = document.getElementById('loggedIn');
+  // animate search to top like Google
+  function liftSearchBar(){ header.classList.add('small'); window.scrollTo({top:0, behavior:'smooth'}); }
 
-  const panelCreate = document.getElementById('panelCreate');
-  const btnCreateDomain = document.getElementById('btn-createDomain');
-  const domainNameInput = document.getElementById('domainName');
-  const btnDoCreate = document.getElementById('btn-doCreate');
-  const btnCancelCreate = document.getElementById('btn-cancelCreate');
-  const createMsg = document.getElementById('createMsg');
+  // build a result card DOM
+  function makeResultCard({title, url, snippet, favicon, isInternal=false, id}) {
+    const wrap = document.createElement('div'); wrap.className = 'result';
+    const fav = document.createElement('div'); fav.className='favicon';
+    const img = document.createElement('img');
+    img.style.width='100%'; img.style.height='100%'; img.style.objectFit='cover';
+    img.alt = '';
+    if(favicon) img.src = favicon;
+    else img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#ffe78e"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="26" font-family="Arial">L</text></svg>');
+    fav.appendChild(img);
+    wrap.appendChild(fav);
 
-  const panelEditor = document.getElementById('panelEditor');
-  const btnEditSite = document.getElementById('btn-editSite');
-  const selectMyDomains = document.getElementById('selectMyDomains');
-  const siteTitle = document.getElementById('siteTitle');
-  const siteDesc = document.getElementById('siteDesc');
-  const siteKeywords = document.getElementById('siteKeywords');
-  const siteHtml = document.getElementById('siteHtml');
-  const btnSaveSite = document.getElementById('btn-saveSite');
-  const btnCancelEdit = document.getElementById('btn-cancelEdit');
-  const editorMsg = document.getElementById('editorMsg');
-
-  const panelMySites = document.getElementById('panelMySites');
-  const btnMySites = document.getElementById('btn-mySites');
-  const mySitesList = document.getElementById('mySitesList');
-  const btnCloseMySites = document.getElementById('btn-closeMySites');
-
-  const btnLogoutTop = document.getElementById('btn-logout');
-
-  // helpers
-  const ADMIN_EMAIL = 'alibahsburiev@gmail.com';
-
-  function showStatus(s){ statusEl.textContent = s; }
-
-  // ---------- Auth handlers ----------
-  btnRegister.addEventListener('click', async () => {
-    const email = emailInput.value.trim();
-    const pass = passInput.value;
-    if(!email || !pass || pass.length < 6){ alert('Введите корректную почту и пароль (минимум 6 символов).'); return; }
-    try {
-      await createUserWithEmailAndPassword(auth, email, pass);
-      alert('Регистрация успешна — вы вошли в систему.');
-    } catch (err) {
-      alert('Ошибка регистрации: ' + err.message);
+    const body = document.createElement('div'); body.className='res-body';
+    const t = document.createElement('div'); t.className='res-title'; t.textContent = title || (id? (id + '.lumos') : url);
+    body.appendChild(t);
+    if(url){
+      const u = document.createElement('div'); u.className='res-url'; u.textContent = url;
+      body.appendChild(u);
     }
-  });
-
-  btnSignin.addEventListener('click', async () => {
-    const email = emailInput.value.trim();
-    const pass = passInput.value;
-    if(!email || !pass){ alert('Введите email и пароль.'); return; }
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-      alert('Вход выполнен.');
-    } catch (err) {
-      alert('Ошибка входа: ' + err.message);
+    if(snippet){
+      const s = document.createElement('div'); s.className='res-snippet';
+      s.textContent = snippet;
+      body.appendChild(s);
     }
-  });
-
-  btnLogout.addEventListener('click', async () => {
-    await signOut(auth);
-  });
-
-  // update UI on auth change
-  onAuthStateChanged(auth, async (user) => {
-    if(user){
-      userEmailLabel.textContent = user.email;
-      loggedOutPanel.style.display = 'none';
-      loggedInPanel.style.display = 'block';
-      btnLogin.style.display = 'none';
-      btnLogout.style.display = 'inline-block';
-      userEmailLabel.style.display = 'inline-block';
-      // populate user's domains in editor select
-      await loadMyDomainsToSelect(user.uid);
+    // actions
+    const actions = document.createElement('div'); actions.style.marginTop='8px';
+    if(isInternal){
+      const open = document.createElement('a'); open.href='#'; open.className='muted'; open.textContent='Открыть на Lumos';
+      open.addEventListener('click', (ev)=>{ ev.preventDefault(); openInternalSite(id); });
+      actions.appendChild(open);
     } else {
-      userEmailLabel.textContent = '';
-      loggedOutPanel.style.display = 'block';
-      loggedInPanel.style.display = 'none';
-      btnLogin.style.display = 'inline-block';
-      btnLogout.style.display = 'none';
-      selectMyDomains.innerHTML = '';
+      if(url){
+        const go = document.createElement('a'); go.href = url; go.target='_blank'; go.rel='noopener'; go.textContent='Открыть страницу';
+        go.style.marginRight='8px';
+        actions.appendChild(go);
+      }
+      const ext = document.createElement('a'); ext.href=`https://duckduckgo.com/?q=${encodeURIComponent(title || url)}`; ext.target='_blank'; ext.rel='noopener'; ext.textContent='Показать в DuckDuckGo';
+      actions.appendChild(ext);
     }
-  });
+    body.appendChild(actions);
 
-  // open login/register panel
-  btnLogin.addEventListener('click', () => {
-    window.scrollTo({top:0, behavior:'smooth'});
-    emailInput.focus();
-  });
+    wrap.appendChild(body);
+    return wrap;
+  }
 
-  // ---------- Domain creation logic ----------
-  btnCreateDomain.addEventListener('click', () => {
-    panelCreate.style.display = 'block';
-  });
-  btnCancelCreate.addEventListener('click', () => {
-    panelCreate.style.display = 'none';
-    createMsg.textContent = '';
-  });
-
-  btnDoCreate.addEventListener('click', async () => {
-    createMsg.textContent = '';
-    const desired = (domainNameInput.value || '').trim().toLowerCase();
-    if(!desired.match(/^[a-z0-9\-]{2,30}$/)){
-      createMsg.textContent = 'Имя должно быть 2–30 символов: латинские буквы, цифры или дефис.';
-      return;
+  // open internal site from Firestore content (in iframe)
+  async function openInternalSite(name){
+    try{
+      statusEl.textContent = 'Загружаю сайт ' + name + '.lumos';
+      // fetch document
+      const snap = await getDocs(collection(db, 'domains'));
+      let docData = null;
+      snap.forEach(d => { if(d.id === name) docData = d.data(); });
+      if(!docData){
+        statusEl.textContent = 'Сайт не найден';
+        return;
+      }
+      const html = docData.siteHtml || `<h1>${escapeText(name)}</h1><p>Пустой сайт.</p>`;
+      frame.srcdoc = html;
+      viewer.style.display = 'block';
+      statusEl.textContent = 'Открыт ' + name + '.lumos';
+    }catch(e){
+      statusEl.textContent = 'Ошибка: ' + e.message;
     }
-    const user = auth.currentUser;
-    if(!user){ createMsg.textContent = 'Нужно войти для создания поддомена.'; return; }
+  }
 
-    const domainRef = doc(db, 'domains', desired);
-    const snap = await getDoc(domainRef);
-    if(snap.exists()){
-      createMsg.textContent = 'Это имя уже занято. Попробуй другое.';
-      return;
-    }
-
-    // Admin bypass: admin can create free
-    const isAdmin = (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
-
-    // For prototype: no payment integration — admin free, others free too for now.
-    // In production, check payment here (via Telegram bot / payment gateway).
-    try {
-      await setDoc(domainRef, {
-        ownerUid: user.uid,
-        ownerEmail: user.email || null,
-        createdAt: serverTimestamp(),
-        title: desired,
-        description: `Сайт пользователя ${desired} на Lumos`,
-        keywords: [desired],
-        siteHtml: `<html><head><meta charset="utf-8"><title>${escapeHtmlPlain(desired)}</title></head><body><h1>Добро пожаловать на ${escapeHtmlPlain(desired)}.lumos</h1><p>Это мини-сайт, созданный в Lumos.</p></body></html>`
-      });
-      createMsg.style.color = 'green';
-      createMsg.textContent = `Поддомен "${desired}" успешно создан!`;
-      domainNameInput.value = '';
-      panelCreate.style.display = 'none';
-      await loadMyDomainsToSelect(user.uid); // refresh user's list
-    } catch (err) {
-      createMsg.style.color = '#b91c1c';
-      createMsg.textContent = 'Ошибка создания: ' + err.message;
-    }
-  });
-
-  // ---------- Editor logic ----------
-  btnEditSite.addEventListener('click', async () => {
-    const user = auth.currentUser;
-    if(!user){ alert('Войдите, чтобы редактировать сайты.'); return; }
-    await loadMyDomainsToSelect(user.uid);
-    panelEditor.style.display = 'block';
-  });
-  btnCancelEdit.addEventListener('click', ()=> { panelEditor.style.display = 'none'; editorMsg.textContent = ''; });
-
-  selectMyDomains.addEventListener('change', async () => {
-    const name = selectMyDomains.value;
-    if(!name) return;
-    const snap = await getDoc(doc(db, 'domains', name));
-    if(!snap.exists()){ editorMsg.textContent = 'Документ потерян.'; return; }
-    const data = snap.data();
-    siteTitle.value = data.title || '';
-    siteDesc.value = data.description || '';
-    siteKeywords.value = (Array.isArray(data.keywords)? data.keywords.join(',') : (data.keywords||''));
-    siteHtml.value = data.siteHtml || (`<h1>${escapeHtmlPlain(name)}</h1><p>Ваш сайт в Lumos</p>`);
-    editorMsg.textContent = '';
-  });
-
-  btnSaveSite.addEventListener('click', async () => {
-    const user = auth.currentUser;
-    if(!user){ editorMsg.textContent = 'Нужно войти.'; return; }
-    const name = selectMyDomains.value;
-    if(!name){ editorMsg.textContent = 'Выберите поддомен.'; return; }
-
-    // verify ownership
-    const domainRef = doc(db, 'domains', name);
-    const snap = await getDoc(domainRef);
-    if(!snap.exists()){ editorMsg.textContent = 'Домен не найден.'; return; }
-    const info = snap.data();
-    if(info.ownerUid !== user.uid && (user.email !== ADMIN_EMAIL)) {
-      editorMsg.textContent = 'Вы не владелец этого поддомена.';
-      return;
-    }
-
-    try {
-      const keywordsArr = siteKeywords.value.split(',').map(s=>s.trim()).filter(Boolean);
-      await updateDoc(domainRef, {
-        title: siteTitle.value || name,
-        description: siteDesc.value || '',
-        keywords: keywordsArr,
-        siteHtml: siteHtml.value || '',
-        updatedAt: serverTimestamp()
-      });
-      editorMsg.style.color = 'green';
-      editorMsg.textContent = 'Сайт сохранён.';
-    } catch (err) {
-      editorMsg.style.color = '#b91c1c';
-      editorMsg.textContent = 'Ошибка сохранения: ' + err.message;
-    }
-  });
-
-  // ---------- My sites list ----------
-  btnMySites.addEventListener('click', async () => {
-    const user = auth.currentUser;
-    if(!user){ alert('Войдите, чтобы увидеть свои сайты.'); return; }
-    panelMySites.style.display = 'block';
-    mySitesList.innerHTML = 'Загрузка...';
-    const q = await getDocs(collection(db, 'domains'));
-    const arr = [];
-    q.forEach(d => {
-      const val = d.data();
-      if(val.ownerUid === user.uid) arr.push({id:d.id, ...val});
+  // DuckDuckGo JSONP Instant Answer fetch
+  function duckInstant(query, timeout=7000){
+    return new Promise((resolve, reject)=>{
+      const cb = 'lumos_dd_cb_' + Math.floor(Math.random()*1e9);
+      const script = document.createElement('script');
+      script.src = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_redirect=1&skip_disambig=1&callback=${cb}`;
+      let timer = setTimeout(()=>{ cleanup(); reject(new Error('timeout')); }, timeout);
+      window[cb] = function(data){ clearTimeout(timer); cleanup(); resolve(data); };
+      script.onerror = function(){ clearTimeout(timer); cleanup(); reject(new Error('network')); };
+      function cleanup(){ try{ delete window[cb]; }catch(e){} if(script.parentNode) script.parentNode.removeChild(script); }
+      document.head.appendChild(script);
     });
-    if(arr.length === 0) mySitesList.innerHTML = '<div class="tiny">У вас пока нет сайтов.</div>';
-    else {
-      mySitesList.innerHTML = '';
-      arr.forEach(s => {
-        const div = document.createElement('div');
-        div.style.padding = '8px 0';
-        div.innerHTML = `<div style="font-weight:700">${escapeHtmlPlain(s.id)}.lumos</div>
-                         <div class="tiny">${escapeHtmlPlain(s.description||'')}</div>
-                         <div style="margin-top:6px"><a class="link-btn" href="#" data-go="${escapeHtmlPlain(s.id)}">Открыть</a></div>`;
-        mySitesList.appendChild(div);
-      });
-      // add click handlers
-      mySitesList.querySelectorAll('a[data-go]').forEach(a=>{
-        a.addEventListener('click', (e)=>{
-          e.preventDefault(); const nm = a.getAttribute('data-go'); renderSite(nm);
-        });
-      });
-    }
-  });
-  btnCloseMySites.addEventListener('click', ()=> panelMySites.style.display = 'none');
+  }
 
-  // ---------- Search logic ----------
+  // main search
+  async function doSearch(raw){
+    const q = (raw||'').trim();
+    if(!q){ statusEl.textContent = 'Введите запрос'; return; }
+    liftSearchBar();
+    statusEl.textContent = 'Ищем: ' + q;
+    resultsEl.innerHTML = '';
+    viewer.style.display = 'none';
+
+    // 1) If it's a "site" like name.lumos -> direct internal open
+    if(q.toLowerCase().endsWith('.lumos')){
+      const name = q.slice(0, -6).toLowerCase();
+      // find doc in Firestore
+      try{
+        const snap = await getDocs(collection(db, 'domains'));
+        let found = false;
+        snap.forEach(d => { if(d.id === name){ found = true; }});
+        if(found){ openInternalSite(name); return; }
+        else { resultsEl.innerHTML = `<div class="result"><div class="res-body"><div class="res-title">Сайт не найден</div><div class="res-snippet">Поддомен ${escapeText(name)} не зарегистрирован в Lumos.</div></div></div>`; return; }
+      }catch(e){ resultsEl.innerHTML = `<div class="result"><div class="res-body">Ошибка поиска: ${escapeText(e.message)}</div></div>`; return; }
+    }
+
+    // 2) internal search (Firestore) — client-side filtering
+    try{
+      resultsEl.innerHTML = `<div class="muted">Ищем внутри Lumos...</div>`;
+      const snap = await getDocs(collection(db, 'domains'));
+      const ql = q.toLowerCase();
+      const matches = [];
+      snap.forEach(d=>{
+        const data = d.data();
+        const hay = ((data.title||'') + ' ' + (data.description||'') + ' ' + (Array.isArray(data.keywords)? data.keywords.join(' '): '') + ' ' + d.id).toLowerCase();
+        if(hay.indexOf(ql) !== -1) matches.push({id:d.id, ...data});
+      });
+
+      resultsEl.innerHTML = '';
+      if(matches.length){
+        for(const m of matches){
+          const snippet = (m.description && m.description.split(/\s+/).slice(0,12).join(' ') + '...') || (m.siteHtml && stripText(m.siteHtml, 12)) || '';
+          const favicon = ''; // internal: show L icon or can derive from owner
+          const card = makeResultCard({title: m.title || (m.id + '.lumos'), url: `https://${location.host}/sites/${m.id}/`, snippet, favicon, isInternal:true, id:m.id});
+          resultsEl.appendChild(card);
+        }
+      } else {
+        resultsEl.innerHTML = `<div class="result"><div class="res-body"><div class="res-title">Ничего не найдено в Lumos</div><div class="res-snippet">Показываем быстрый ответ и ссылки на внешние поисковики.</div></div></div>`;
+      }
+    }catch(e){
+      resultsEl.innerHTML = `<div class="result"><div class="res-body">Ошибка внутреннего поиска: ${escapeText(e.message)}</div></div>`;
+    }
+
+    // 3) DuckDuckGo Instant Answer (featured snippet) - show as top card if available
+    try{
+      const data = await duckInstant(q);
+      // Choose text from AbstractText or Heading or RelatedTopics
+      let snippet = '';
+      let title = '';
+      let sourceUrl = '';
+      if(data){
+        if(data.Heading) title = data.Heading;
+        if(data.AbstractText) snippet = data.AbstractText;
+        if(data.AbstractURL) sourceUrl = data.AbstractURL;
+      }
+      if(snippet || title){
+        // place it at top visually
+        const fav = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#ffe78e"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="26" font-family="Arial">A</text></svg>');
+        const topCard = makeResultCard({title: title || q, url: sourceUrl || ('https://duckduckgo.com/?q=' + encodeURIComponent(q)), snippet: snippet, favicon: fav, isInternal:false});
+        // insert at top
+        resultsEl.insertBefore(topCard, resultsEl.firstChild);
+      }
+    }catch(e){
+      // ignore instant errors (timeout/network)
+      console.warn('Duck instant error', e);
+    }
+
+    // 4) add external search suggestions (Duck/Google/Bing)
+    const qEnc = encodeURIComponent(q);
+    const extCard = document.createElement('div'); extCard.className='result';
+    const favDiv = document.createElement('div'); favDiv.className='favicon';
+    favDiv.innerHTML = '<img src="data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#e9f2ff"/></svg>') + '" style="width:100%;height:100%;object-fit:cover">';
+    extCard.appendChild(favDiv);
+    const body = document.createElement('div'); body.className='res-body';
+    const titleEl = document.createElement('div'); titleEl.className='res-title'; titleEl.textContent = 'Результаты в поисковых системах';
+    body.appendChild(titleEl);
+    const linksDiv = document.createElement('div'); linksDiv.style.display='flex'; linksDiv.style.gap='8px'; linksDiv.style.marginTop='6px';
+    const mk = (name, url) => { const a = document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; a.className='muted'; a.textContent=name; return a; };
+    linksDiv.appendChild(mk('DuckDuckGo', 'https://duckduckgo.com/?q='+qEnc));
+    linksDiv.appendChild(mk('Google', 'https://www.google.com/search?q='+qEnc));
+    linksDiv.appendChild(mk('Bing', 'https://www.bing.com/search?q='+qEnc));
+    body.appendChild(linksDiv);
+    extCard.appendChild(body);
+    resultsEl.appendChild(extCard);
+
+    // update side link
+    duckLink.href = 'https://duckduckgo.com/?q=' + qEnc;
+    statusEl.textContent = 'Готово';
+  }
+
+  // helper: strip tags and return first N words
+  function stripText(html, words = 12){
+    const tmp = html.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<\/?[^>]+(>|$)/g, ' ');
+    return tmp.split(/\s+/).filter(Boolean).slice(0,words).join(' ') + (tmp.split(/\s+/).length > words ? '...' : '');
+  }
+
+  // fav icon helper (Google's s2 service)
+  function faviconFor(url){
+    try{ const hostname = domainFromUrl(url); return 'https://www.google.com/s2/favicons?sz=64&domain=' + encodeURIComponent(hostname); }catch(e){ return ''; }
+  }
+
+  // wire UI
   goBtn.addEventListener('click', ()=> doSearch(qInput.value));
   qInput.addEventListener('keydown', (e)=> { if(e.key === 'Enter') doSearch(qInput.value); });
 
-  async function doSearch(raw){
-    const q = (raw||'').trim();
-    if(!q){ showStatus('Введите запрос.'); return; }
-    showStatus('Ищем: ' + q);
-    resultsWrap.innerHTML = ''; viewerWrap.style.display = 'none';
+  // initial focus
+  setTimeout(()=> qInput.focus(),300);
 
-    // If user typed something like "hay.lumos" -> try redirect to internal site
-    if(q.toLowerCase().endsWith('.lumos')){
-      const name = q.slice(0, -6).toLowerCase();
-      if(!name.match(/^[a-z0-9\-]+$/)){ resultsWrap.innerHTML = `<div class="result-item">Неверное имя: ${escapeHtmlPlain(q)}</div>`; return; }
-      const snap = await getDoc(doc(db, 'domains', name));
-      if(snap.exists()){
-        renderSite(name);
-        showStatus('Открываем ' + name + '.lumos');
-        return;
-      } else {
-        resultsWrap.innerHTML = `<div class="result-item"><div class="result-title">Сайт не найден</div><div class="result-desc">Поддомен ${escapeHtmlPlain(name)} не зарегистрирован в Lumos.</div></div>`;
-        return;
-      }
-    }
-
-    // Otherwise: search internal DB (basic client-side filtering) + show external search links
-    resultsWrap.innerHTML = `<div class="result-item">Идёт поиск по внутренней базе Lumos...</div>`;
-    try {
-      const snap = await getDocs(collection(db, 'domains'));
-      const qlower = q.toLowerCase();
-      const matches = [];
-      snap.forEach(d => {
-        const data = d.data();
-        const title = (data.title||'').toString();
-        const desc = (data.description||'').toString();
-        const keys = (Array.isArray(data.keywords)? data.keywords.join(' ') : (data.keywords||'')).toString();
-        const hay = (title + ' ' + desc + ' ' + keys + ' ' + d.id).toLowerCase();
-        if(hay.indexOf(qlower) !== -1) matches.push({id:d.id, ...data});
-      });
-
-      // Build results
-      resultsWrap.innerHTML = '';
-      if(matches.length){
-        const header = document.createElement('div'); header.className='result-item'; header.innerHTML = `<div class="result-title">Результаты внутри Lumos</div><div class="result-desc tiny">${matches.length} найдено</div>`;
-        resultsWrap.appendChild(header);
-        matches.forEach(m=>{
-          const el = document.createElement('div'); el.className='result-item';
-          el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-                            <div>
-                              <div class="result-title">${escapeHtmlPlain(m.title || m.id + '.lumos')}</div>
-                              <div class="result-desc">${escapeHtmlPlain(m.description || '')}</div>
-                            </div>
-                            <div><a class="link-btn" href="#" data-open="${escapeHtmlPlain(m.id)}">Открыть</a></div>
-                          </div>`;
-          resultsWrap.appendChild(el);
-        });
-        // attach open handlers
-        resultsWrap.querySelectorAll('a[data-open]').forEach(a=>{
-          a.addEventListener('click', (e)=>{
-            e.preventDefault(); const nm = a.getAttribute('data-open'); renderSite(nm);
-          });
-        });
-      } else {
-        resultsWrap.innerHTML = `<div class="result-item"><div class="result-title">Внутри Lumos ничего не найдено</div><div class="result-desc">Показываем результаты внешних поисковиков</div></div>`;
-      }
-
-      // External search fallback links
-      const qEnc = encodeURIComponent(q);
-      const ext = document.createElement('div'); ext.className = 'result-item';
-      ext.innerHTML = `<div class="result-title">Внешний поиск</div>
-                       <div style="margin-top:8px" class="links">
-                         <a class="link-btn" target="_blank" rel="noopener" href="https://duckduckgo.com/?q=${qEnc}">DuckDuckGo</a>
-                         <a class="link-btn" target="_blank" rel="noopener" href="https://www.google.com/search?q=${qEnc}">Google</a>
-                         <a class="link-btn" target="_blank" rel="noopener" href="https://www.bing.com/search?q=${qEnc}">Bing</a>
-                       </div>`;
-      resultsWrap.appendChild(ext);
-      showStatus('Готово — результаты показаны.');
-    } catch (err) {
-      resultsWrap.innerHTML = `<div class="result-item">Ошибка поиска: ${escapeHtmlPlain(err.message)}</div>`;
-      showStatus('Ошибка при поиске');
-    }
-  }
-
-  // ---------- render site in viewer ----------
-  async function renderSite(name){
-    viewerWrap.style.display = 'block';
-    resultsWrap.innerHTML = '';
-    showStatus('Загрузка сайта ' + name + '.lumos ...');
-    try {
-      const snap = await getDoc(doc(db, 'domains', name));
-      if(!snap.exists()){ resultsWrap.innerHTML = `<div class="result-item">Сайт не найден.</div>`; viewerWrap.style.display = 'none'; return; }
-      const data = snap.data();
-      viewerTitle.textContent = (data.title || name + '.lumos');
-      viewerMeta.textContent = (data.ownerEmail? data.ownerEmail : '');
-      const html = data.siteHtml || `<h1>${escapeHtmlPlain(name)}</h1><p>Пустой сайт.</p>`;
-      // render into iframe via srcdoc (sandboxed)
-      siteFrame.srcdoc = html;
-      // set hash for shareable link
-      location.hash = 'site=' + encodeURIComponent(name);
-      showStatus('Сайт загружен: ' + name + '.lumos');
-    } catch (err) {
-      showStatus('Ошибка загрузки: ' + err.message);
-      resultsWrap.innerHTML = `<div class="result-item">Ошибка: ${escapeHtmlPlain(err.message)}</div>`;
-    }
-  }
-
-  // On load: if hash like #site=name -> open it
-  window.addEventListener('load', ()=>{
-    const h = location.hash;
-    if(h && h.startsWith('#site=')){
-      const name = decodeURIComponent(h.slice(6));
-      if(name) renderSite(name);
-    }
-  });
-
-  // ---------- Utilities ----------
-  function escapeHtmlPlain(s){
-    if(!s) return '';
-    return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
-  }
-
-  async function loadMyDomainsToSelect(uid){
-    selectMyDomains.innerHTML = '';
-    const q = await getDocs(collection(db, 'domains'));
-    const my = [];
-    q.forEach(d=>{
-      const data = d.data();
-      if(data.ownerUid === uid) my.push(d.id);
-    });
-    if(my.length === 0){
-      selectMyDomains.innerHTML = '<option value="">У вас нет сайтов</option>';
-    } else {
-      selectMyDomains.innerHTML = '<option value="">-- выберите --</option>' + my.map(n=>`<option value="${escapeHtmlPlain(n)}">${escapeHtmlPlain(n)}.lumos</option>`).join('');
-    }
-  }
-
-  // small helper: update list on sign in/out
-  // Already handled in onAuthStateChanged
-
-  // ---------- small XSS caution note to admin in console ----------
-  console.info('Lumos prototype loaded. Note: site HTML is stored in Firestore (siteHtml). Viewer uses iframe.srcdoc (sandboxed allow-scripts).');
-
-  // triple-checked logical flows: registration -> domain creation -> edit -> search -> viewer
   // End of module
   </script>
 </body>
