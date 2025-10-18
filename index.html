@@ -1,22 +1,23 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Lumos — Поиск</title>
-  <meta name="description" content="Lumos — поиск + мини-сайты" />
+  <meta name="description" content="Lumos — поиск по интернету и по мини-сайтам пользователей" />
   <meta name="theme-color" content="#ffffff">
   <style>
     :root{
-      --bg:#ffffff; --accent:#ffd428; --muted:#6b7280; --card:#fff; --maxw:980px;
-      font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+      --bg:#ffffff; --accent:#ffd428; --muted:#6b7280; --card:#fff;
+      --maxw:980px; font-family:Inter, Roboto, Arial, sans-serif;
     }
-    html,body{height:100%;margin:0;background:var(--bg);color:#111827}
+    html,body{height:100%;margin:0;background:var(--bg);color:#111827;-webkit-font-smoothing:antialiased}
     .page{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:28px;box-sizing:border-box}
     .wrap{width:100%;max-width:var(--maxw)}
-    /* header */
-    header.top{display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .28s ease}
-    header.top.small{align-items:flex-start;padding-top:6px}
+    /* header / animated lift */
+    header.top{display:flex;flex-direction:column;align-items:center;gap:8px;transform:translateY(8vh);transition:transform .42s cubic-bezier(.2,.9,.2,1),padding .25s}
+    header.top.lift{transform:translateY(0);align-items:flex-start}
+    @media(max-width:920px){ header.top{transform:translateY(6vh)} header.top.lift{align-items:center} }
     .logo{width:82px;height:82px;border-radius:18px;background:linear-gradient(135deg,#fff6d6,#ffe78e);display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 10px 30px rgba(0,0,0,0.06)}
     h1{margin:0;font-size:22px}
     p.lead{margin:0;color:var(--muted);font-size:14px}
@@ -26,20 +27,23 @@
     .search-row{display:flex;gap:8px;align-items:center}
     input#q{flex:1;padding:14px 12px;border-radius:10px;border:1px solid #e8e9eb;font-size:16px;outline:none}
     button#go{background:var(--accent);border:0;padding:12px 16px;border-radius:10px;font-weight:700;cursor:pointer;box-shadow:0 8px 18px rgba(255,212,40,0.12)}
-    /* layout results */
+    /* layout */
     .main{display:flex;gap:18px;margin-top:18px}
     .left{flex:1}
     .right{width:360px}
-    @media(max-width:920px){ .main{flex-direction:column}.right{width:100%} header.top.small{align-items:center} }
-    /* result card like Google */
+    @media(max-width:920px){ .main{flex-direction:column} .right{width:100%} }
+    /* results */
     .results{display:flex;flex-direction:column;gap:12px}
-    .result{padding:14px;border-radius:8px;background:#fff;border:1px solid #eef0f2;display:flex;gap:12px;align-items:flex-start}
+    .result{padding:14px;border-radius:8px;background:#fff;border:1px solid #eef0f2;display:flex;gap:12px;align-items:flex-start;opacity:0;transform:translateY(6px);animation:fadeIn .28s forwards}
+    @keyframes fadeIn { to {opacity:1; transform:none} }
     .favicon{width:48px;height:48px;border-radius:8px;flex:0 0 48px;background:#fafafa;display:flex;align-items:center;justify-content:center;overflow:hidden}
     .res-body{flex:1}
     .res-title{font-size:15px;font-weight:700;color:#1a202c;margin-bottom:6px}
     .res-url{font-size:13px;color:#0456a6;margin-bottom:6px;word-break:break-all}
     .res-snippet{font-size:14px;color:var(--muted)}
-    /* viewer iframe */
+    .res-actions{margin-top:8px}
+    .link-btn{padding:6px 8px;border-radius:8px;background:transparent;border:1px solid #eef0f2;color:var(--muted);text-decoration:none;font-size:13px;margin-right:8px}
+    /* viewer */
     .viewer{margin-top:12px;border:1px solid #e9eef2;border-radius:10px;overflow:hidden}
     .viewer iframe{width:100%;height:420px;border:0}
     /* small */
@@ -56,9 +60,9 @@
       </header>
 
       <div class="search-wrap">
-        <div class="search-card">
+        <div class="search-card" role="search">
           <div class="search-row">
-            <input id="q" placeholder="Что вы хотите найти? Например: Что такое солнце" />
+            <input id="q" placeholder="Что вы хотите найти? Пример: Что такое солнце" autocomplete="off" />
             <button id="go">Поиск</button>
           </div>
           <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
@@ -68,10 +72,10 @@
         </div>
       </div>
 
-      <div class="main">
+      <div class="main" style="width:100%">
         <div class="left">
           <div id="results" class="results">
-            <div class="muted">Введите запрос и нажмите «Поиск» — Lumos сначала ищет внутри своих мини-сайтов, затем показывает быстрый ответ и ссылки на внешние поисковики.</div>
+            <div class="muted">Введите запрос и нажмите «Поиск». Lumos сначала ищет по своим мини-сайтам, затем показывает быстрый ответ и внешние результаты.</div>
           </div>
 
           <div id="viewer" class="viewer" style="display:none;margin-top:12px">
@@ -82,22 +86,32 @@
         <aside class="right">
           <div style="padding:12px;border-radius:10px;border:1px solid #eef0f2;background:#fff">
             <div style="font-weight:700">Поддержка Lumos</div>
-            <div class="muted" style="margin-top:8px">Пользователи могут создавать мини-сайты через панель. Админ получает привилегии бесплатно.</div>
-            <div style="margin-top:12px">
-              <a id="duckLink" class="muted" href="#" target="_blank">Открыть в DuckDuckGo</a>
-            </div>
+            <div class="muted" style="margin-top:8px">Пользователи создают мини-сайты через панель. Админ получает привилегии бесплатно.</div>
+            <div style="margin-top:12px"><a id="extDuck" class="link-btn" href="#" target="_blank" rel="noopener">Открыть в DuckDuckGo</a></div>
           </div>
         </aside>
       </div>
     </div>
   </div>
 
-  <!-- Firebase + logic -->
+  <!-- ========== Firebase + search logic ========== -->
   <script type="module">
-  // ---------- Firebase initialization (your config) ----------
+  /************************************************************************
+   * Lumos: improved search UI
+   * - internal search (Firestore) — matches by words (works for long queries)
+   * - DuckDuckGo Instant Answer via JSONP (featured snippet)
+   * - Attempt to fetch DuckDuckGo HTML via AllOrigins proxy to extract SERP (best-effort)
+   * - Smooth lift animation + card rendering + favicons + safe escaping
+   *
+   * Notes:
+   * - AllOrigins proxy is used as a best-effort approach for extracting SERP; it may rate-limit.
+   * - If external parsing fails, we fallback to showing links to DuckDuckGo/Google/Bing.
+   ************************************************************************/
+
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  // use only Firestore here (no auth required for search)
+
+  // ====== Your Firebase config (use your config) ======
   const firebaseConfig = {
     apiKey: "AIzaSyCXPSk94YKKNIVOGnyhnDyuK8-KGPMZJog",
     authDomain: "lumos-f100f.firebaseapp.com",
@@ -110,218 +124,241 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // ---------- DOM ----------
+  // DOM
   const qInput = document.getElementById('q');
   const goBtn = document.getElementById('go');
+  const statusEl = document.getElementById('status');
   const resultsEl = document.getElementById('results');
   const header = document.getElementById('header');
-  const statusEl = document.getElementById('status');
   const viewer = document.getElementById('viewer');
   const frame = document.getElementById('frame');
-  const duckLink = document.getElementById('duckLink');
+  const extDuck = document.getElementById('extDuck');
 
-  // utils
-  function escapeText(s){ if(!s) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
-  function domainFromUrl(u){ try{ const url=new URL(u); return url.hostname; }catch(e){ return u; } }
+  // helpers
+  function escapeText(s){ if(s==null) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+  function stripTags(html){ return String(html).replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<\/?[^>]+(>|$)/g,' '); }
+  function firstNWords(text, n=10){ return (text||'').split(/\s+/).filter(Boolean).slice(0,n).join(' ') + ((text||'').split(/\s+/).length>n ? '...' : ''); }
+  function domainFromUrl(u){ try{ const url = new URL(u); return url.hostname; }catch(e){ return u; } }
+  function faviconFor(url){ try{ const h = domainFromUrl(url); return 'https://www.google.com/s2/favicons?sz=64&domain=' + encodeURIComponent(h); } catch(e){ return ''; } }
 
-  // animate search to top like Google
-  function liftSearchBar(){ header.classList.add('small'); window.scrollTo({top:0, behavior:'smooth'}); }
+  // animate lift
+  function lift(){ header.classList.add('lift'); window.scrollTo({top:0,behavior:'smooth'}); }
+  function unlift(){ header.classList.remove('lift'); }
 
-  // build a result card DOM
-  function makeResultCard({title, url, snippet, favicon, isInternal=false, id}) {
-    const wrap = document.createElement('div'); wrap.className = 'result';
+  // render result card
+  function renderCard({title, url, snippet, favicon, internal=false, id}) {
+    const wrap = document.createElement('div'); wrap.className='result';
     const fav = document.createElement('div'); fav.className='favicon';
-    const img = document.createElement('img');
+    const img = document.createElement('img'); img.alt='';
     img.style.width='100%'; img.style.height='100%'; img.style.objectFit='cover';
-    img.alt = '';
-    if(favicon) img.src = favicon;
-    else img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#ffe78e"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="26" font-family="Arial">L</text></svg>');
+    if(favicon) img.src = favicon; else img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#ffe78e"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="26">L</text></svg>');
     fav.appendChild(img);
     wrap.appendChild(fav);
 
     const body = document.createElement('div'); body.className='res-body';
-    const t = document.createElement('div'); t.className='res-title'; t.textContent = title || (id? (id + '.lumos') : url);
+    const t = document.createElement('div'); t.className='res-title'; t.innerHTML = escapeText(title || (id? (id + '.lumos') : url || ''));
     body.appendChild(t);
     if(url){
       const u = document.createElement('div'); u.className='res-url'; u.textContent = url;
       body.appendChild(u);
     }
     if(snippet){
-      const s = document.createElement('div'); s.className='res-snippet';
-      s.textContent = snippet;
+      const s = document.createElement('div'); s.className='res-snippet'; s.textContent = snippet;
       body.appendChild(s);
     }
-    // actions
-    const actions = document.createElement('div'); actions.style.marginTop='8px';
-    if(isInternal){
-      const open = document.createElement('a'); open.href='#'; open.className='muted'; open.textContent='Открыть на Lumos';
-      open.addEventListener('click', (ev)=>{ ev.preventDefault(); openInternalSite(id); });
+
+    const actions = document.createElement('div'); actions.className='res-actions';
+    if(internal){
+      const open = document.createElement('a'); open.href='#'; open.className='link-btn'; open.textContent='Открыть на Lumos';
+      open.addEventListener('click', (e)=>{ e.preventDefault(); openInternal(id); });
       actions.appendChild(open);
     } else {
       if(url){
-        const go = document.createElement('a'); go.href = url; go.target='_blank'; go.rel='noopener'; go.textContent='Открыть страницу';
-        go.style.marginRight='8px';
-        actions.appendChild(go);
+        const open = document.createElement('a'); open.href=url; open.target='_blank'; open.rel='noopener'; open.className='link-btn'; open.textContent='Открыть страницу';
+        actions.appendChild(open);
       }
-      const ext = document.createElement('a'); ext.href=`https://duckduckgo.com/?q=${encodeURIComponent(title || url)}`; ext.target='_blank'; ext.rel='noopener'; ext.textContent='Показать в DuckDuckGo';
-      actions.appendChild(ext);
+      const show = document.createElement('a'); show.href='https://duckduckgo.com/?q=' + encodeURIComponent(title || url || ''); show.target='_blank'; show.rel='noopener'; show.className='link-btn'; show.textContent='Показать в DuckDuckGo';
+      actions.appendChild(show);
     }
     body.appendChild(actions);
-
     wrap.appendChild(body);
+    resultsEl.appendChild(wrap);
     return wrap;
   }
 
-  // open internal site from Firestore content (in iframe)
-  async function openInternalSite(name){
+  // open internal site (render in iframe)
+  async function openInternal(name){
+    statusEl.textContent = 'Загружаю ' + name + '.lumos';
     try{
-      statusEl.textContent = 'Загружаю сайт ' + name + '.lumos';
-      // fetch document
       const snap = await getDocs(collection(db, 'domains'));
-      let docData = null;
-      snap.forEach(d => { if(d.id === name) docData = d.data(); });
-      if(!docData){
-        statusEl.textContent = 'Сайт не найден';
-        return;
-      }
-      const html = docData.siteHtml || `<h1>${escapeText(name)}</h1><p>Пустой сайт.</p>`;
+      let data = null;
+      snap.forEach(d => { if(d.id === name) data = d.data(); });
+      if(!data){ statusEl.textContent = 'Сайт не найден'; return; }
+      const html = data.siteHtml || `<h1>${escapeText(name)}</h1><p>Пустой сайт.</p>`;
       frame.srcdoc = html;
       viewer.style.display = 'block';
       statusEl.textContent = 'Открыт ' + name + '.lumos';
-    }catch(e){
-      statusEl.textContent = 'Ошибка: ' + e.message;
+    }catch(err){
+      statusEl.textContent = 'Ошибка: ' + err.message;
     }
   }
 
-  // DuckDuckGo JSONP Instant Answer fetch
-  function duckInstant(query, timeout=7000){
+  // DuckDuckGo Instant Answer (JSONP)
+  function duckInstant(query, timeout = 6000){
     return new Promise((resolve, reject)=>{
       const cb = 'lumos_dd_cb_' + Math.floor(Math.random()*1e9);
       const script = document.createElement('script');
-      script.src = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_redirect=1&skip_disambig=1&callback=${cb}`;
+      const url = 'https://api.duckduckgo.com/?q=' + encodeURIComponent(query) + '&format=json&no_html=1&skip_disambig=1&callback=' + cb;
       let timer = setTimeout(()=>{ cleanup(); reject(new Error('timeout')); }, timeout);
-      window[cb] = function(data){ clearTimeout(timer); cleanup(); resolve(data); };
+      window[cb] = function(data){ clearTimeout(timer); cleanup(); resolve(data || {}); };
+      script.src = url;
       script.onerror = function(){ clearTimeout(timer); cleanup(); reject(new Error('network')); };
       function cleanup(){ try{ delete window[cb]; }catch(e){} if(script.parentNode) script.parentNode.removeChild(script); }
       document.head.appendChild(script);
     });
   }
 
-  // main search
+  // Attempt to fetch DuckDuckGo HTML via AllOrigins proxy and parse first results (best-effort)
+  async function fetchDuckSERP(query){
+    // allorigins raw endpoint returns page HTML and supports CORS
+    const ddUrl = 'https://duckduckgo.com/html?q=' + encodeURIComponent(query);
+    const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(ddUrl);
+    try{
+      const r = await fetch(proxy, {cache:'no-store'});
+      if(!r.ok) throw new Error('proxy fetch failed');
+      const text = await r.text();
+      // quick and dirty parse: find result blocks — duckduckgo uses <a rel="nofollow" class="result__a" href="...">Title</a> and snippet in .result__snippet
+      // We'll use regex to extract first 6 anchors and nearby snippet text — fragile but works often
+      const results = [];
+      // Match links and surrounding snippet
+      const linkRegex = /<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+      let m;
+      while((m = linkRegex.exec(text)) && results.length < 8){
+        const url = m[1];
+        const rawTitle = m[2].replace(/<\/?[^>]+(>|$)/g, ' ');
+        // find snippet after the link
+        const after = text.slice(m.index, m.index + 800);
+        const snippetMatch = after.match(/<a[^>]*class="result__a"[^>]*>[\s\S]*?<\/a>[\s\S]*?<a[^>]*class="result__snippet"[^>]*>([\s\S]*?)<\/a>/i);
+        let snippet = '';
+        if(snippetMatch && snippetMatch[1]) snippet = snippetMatch[1].replace(/<\/?[^>]+(>|$)/g,' ').trim();
+        if(!snippet){
+          // fallback: try to pick a few words after the link
+          snippet = after.replace(/<\/?[^>]+(>|$)/g,' ').split(/\s+/).slice(0,14).join(' ');
+        }
+        results.push({title: rawTitle.trim(), url, snippet: snippet.trim()});
+      }
+      return results;
+    }catch(e){
+      console.warn('Duck SERP parse failed:', e);
+      return null; // indicate failure -> fallback to links
+    }
+  }
+
+  // Search logic: internal (Firestore) by words, then Instant Answer, then external SERP (best-effort)
+  goBtn.addEventListener('click', ()=> doSearch(qInput.value));
+  qInput.addEventListener('keydown', (e)=> { if(e.key === 'Enter') doSearch(qInput.value); });
+
   async function doSearch(raw){
     const q = (raw||'').trim();
     if(!q){ statusEl.textContent = 'Введите запрос'; return; }
-    liftSearchBar();
+    lift();
     statusEl.textContent = 'Ищем: ' + q;
     resultsEl.innerHTML = '';
     viewer.style.display = 'none';
+    extDuck.href = 'https://duckduckgo.com/?q=' + encodeURIComponent(q);
 
-    // 1) If it's a "site" like name.lumos -> direct internal open
+    // 1) if it's like name.lumos => open internal
     if(q.toLowerCase().endsWith('.lumos')){
       const name = q.slice(0, -6).toLowerCase();
-      // find doc in Firestore
+      // quick find
       try{
         const snap = await getDocs(collection(db, 'domains'));
         let found = false;
-        snap.forEach(d => { if(d.id === name){ found = true; }});
-        if(found){ openInternalSite(name); return; }
-        else { resultsEl.innerHTML = `<div class="result"><div class="res-body"><div class="res-title">Сайт не найден</div><div class="res-snippet">Поддомен ${escapeText(name)} не зарегистрирован в Lumos.</div></div></div>`; return; }
-      }catch(e){ resultsEl.innerHTML = `<div class="result"><div class="res-body">Ошибка поиска: ${escapeText(e.message)}</div></div>`; return; }
+        snap.forEach(d => { if(d.id === name) found = true; });
+        if(found){ openInternal(name); statusEl.textContent = 'Открываю ' + name + '.lumos'; return; }
+        else { resultsEl.innerHTML = `<div class="result"><div class="res-body"><div class="res-title">Сайт не найден</div><div class="res-snippet">Поддомен ${escapeText(name)} не зарегистрирован.</div></div></div>`; statusEl.textContent = 'Готово'; return; }
+      }catch(err){ resultsEl.innerHTML = `<div class="result"><div class="res-body">Ошибка: ${escapeText(err.message)}</div></div>`; return; }
     }
 
-    // 2) internal search (Firestore) — client-side filtering
+    // 2) internal search (Firestore) — match by words
     try{
       resultsEl.innerHTML = `<div class="muted">Ищем внутри Lumos...</div>`;
       const snap = await getDocs(collection(db, 'domains'));
-      const ql = q.toLowerCase();
+      const qWords = q.toLowerCase().split(/\s+/).filter(Boolean);
       const matches = [];
       snap.forEach(d=>{
         const data = d.data();
         const hay = ((data.title||'') + ' ' + (data.description||'') + ' ' + (Array.isArray(data.keywords)? data.keywords.join(' '): '') + ' ' + d.id).toLowerCase();
-        if(hay.indexOf(ql) !== -1) matches.push({id:d.id, ...data});
+        // require that each word exists somewhere (AND). If you want OR, replace with some()
+        const ok = qWords.every(w => hay.indexOf(w) !== -1);
+        if(ok) matches.push({id:d.id, ...data});
       });
 
       resultsEl.innerHTML = '';
       if(matches.length){
         for(const m of matches){
-          const snippet = (m.description && m.description.split(/\s+/).slice(0,12).join(' ') + '...') || (m.siteHtml && stripText(m.siteHtml, 12)) || '';
-          const favicon = ''; // internal: show L icon or can derive from owner
-          const card = makeResultCard({title: m.title || (m.id + '.lumos'), url: `https://${location.host}/sites/${m.id}/`, snippet, favicon, isInternal:true, id:m.id});
-          resultsEl.appendChild(card);
+          const snippet = m.description ? firstNWords(stripTags(m.description), 12) : (m.siteHtml ? firstNWords(stripTags(m.siteHtml), 12) : '');
+          renderCard({title: m.title || (m.id + '.lumos'), url: `https://${location.host}/sites/${m.id}/`, snippet, favicon: '', internal:true, id:m.id});
         }
       } else {
-        resultsEl.innerHTML = `<div class="result"><div class="res-body"><div class="res-title">Ничего не найдено в Lumos</div><div class="res-snippet">Показываем быстрый ответ и ссылки на внешние поисковики.</div></div></div>`;
+        // no internal matches -> small notice, will continue to external results
+        resultsEl.innerHTML = `<div class="result"><div class="res-body"><div class="res-title">Внутри Lumos ничего не найдено</div><div class="res-snippet">Ищем внешние страницы и быстрые ответы...</div></div></div>`;
       }
-    }catch(e){
-      resultsEl.innerHTML = `<div class="result"><div class="res-body">Ошибка внутреннего поиска: ${escapeText(e.message)}</div></div>`;
+    }catch(err){
+      resultsEl.innerHTML = `<div class="result"><div class="res-body">Ошибка внутреннего поиска: ${escapeText(err.message)}</div></div>`;
     }
 
-    // 3) DuckDuckGo Instant Answer (featured snippet) - show as top card if available
+    // 3) Instant Answer (DuckDuckGo) — JSONP
     try{
-      const data = await duckInstant(q);
-      // Choose text from AbstractText or Heading or RelatedTopics
-      let snippet = '';
-      let title = '';
-      let sourceUrl = '';
-      if(data){
-        if(data.Heading) title = data.Heading;
-        if(data.AbstractText) snippet = data.AbstractText;
-        if(data.AbstractURL) sourceUrl = data.AbstractURL;
+      const inst = await duckInstant(q).catch(()=>null);
+      if(inst && (inst.AbstractText || inst.Heading)){
+        const title = inst.Heading || q;
+        const snippet = inst.AbstractText ? firstNWords(inst.AbstractText, 24) : '';
+        const url = inst.AbstractURL || ('https://duckduckgo.com/?q=' + encodeURIComponent(q));
+        const fav = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#ffe78e"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="26">A</text></svg>');
+        // insert top
+        const top = renderCard({title, url, snippet, favicon: fav, internal:false});
+        resultsEl.insertBefore(top, resultsEl.firstChild);
       }
-      if(snippet || title){
-        // place it at top visually
-        const fav = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#ffe78e"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="26" font-family="Arial">A</text></svg>');
-        const topCard = makeResultCard({title: title || q, url: sourceUrl || ('https://duckduckgo.com/?q=' + encodeURIComponent(q)), snippet: snippet, favicon: fav, isInternal:false});
-        // insert at top
-        resultsEl.insertBefore(topCard, resultsEl.firstChild);
+    }catch(e){ console.warn('Instant failed', e); }
+
+    // 4) External SERP (best effort using AllOrigins proxy)
+    let externalResults = null;
+    try{
+      externalResults = await fetchDuckSERP(q);
+    }catch(e){ externalResults = null; }
+    if(Array.isArray(externalResults) && externalResults.length){
+      // render first few
+      for(const r of externalResults.slice(0,8)){
+        const fav = faviconFor(r.url || r.title);
+        const snippet = firstNWords(stripTags(r.snippet || ''), 12);
+        renderCard({title: stripTags(r.title || r.url), url: r.url, snippet, favicon: fav, internal:false});
       }
-    }catch(e){
-      // ignore instant errors (timeout/network)
-      console.warn('Duck instant error', e);
+    } else {
+      // fallback: show links to search engines
+      const qEnc = encodeURIComponent(q);
+      const fallbackCard = document.createElement('div'); fallbackCard.className='result';
+      const favDiv = document.createElement('div'); favDiv.className='favicon';
+      favDiv.innerHTML = '<img src="data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#e9f2ff"/></svg>') + '" style="width:100%;height:100%;object-fit:cover">';
+      fallbackCard.appendChild(favDiv);
+      const body = document.createElement('div'); body.className='res-body';
+      const titleEl = document.createElement('div'); titleEl.className='res-title'; titleEl.textContent = 'Результаты в поисковых системах';
+      body.appendChild(titleEl);
+      const links = document.createElement('div'); links.style.display='flex'; links.style.gap='8px'; links.style.marginTop='6px';
+      const mk = (name, url) => { const a = document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; a.className='link-btn'; a.textContent=name; return a; };
+      links.appendChild(mk('DuckDuckGo', 'https://duckduckgo.com/?q=' + qEnc));
+      links.appendChild(mk('Google', 'https://www.google.com/search?q=' + qEnc));
+      links.appendChild(mk('Bing', 'https://www.bing.com/search?q=' + qEnc));
+      body.appendChild(links);
+      fallbackCard.appendChild(body);
+      resultsEl.appendChild(fallbackCard);
     }
 
-    // 4) add external search suggestions (Duck/Google/Bing)
-    const qEnc = encodeURIComponent(q);
-    const extCard = document.createElement('div'); extCard.className='result';
-    const favDiv = document.createElement('div'); favDiv.className='favicon';
-    favDiv.innerHTML = '<img src="data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#e9f2ff"/></svg>') + '" style="width:100%;height:100%;object-fit:cover">';
-    extCard.appendChild(favDiv);
-    const body = document.createElement('div'); body.className='res-body';
-    const titleEl = document.createElement('div'); titleEl.className='res-title'; titleEl.textContent = 'Результаты в поисковых системах';
-    body.appendChild(titleEl);
-    const linksDiv = document.createElement('div'); linksDiv.style.display='flex'; linksDiv.style.gap='8px'; linksDiv.style.marginTop='6px';
-    const mk = (name, url) => { const a = document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; a.className='muted'; a.textContent=name; return a; };
-    linksDiv.appendChild(mk('DuckDuckGo', 'https://duckduckgo.com/?q='+qEnc));
-    linksDiv.appendChild(mk('Google', 'https://www.google.com/search?q='+qEnc));
-    linksDiv.appendChild(mk('Bing', 'https://www.bing.com/search?q='+qEnc));
-    body.appendChild(linksDiv);
-    extCard.appendChild(body);
-    resultsEl.appendChild(extCard);
-
-    // update side link
-    duckLink.href = 'https://duckduckgo.com/?q=' + qEnc;
     statusEl.textContent = 'Готово';
   }
 
-  // helper: strip tags and return first N words
-  function stripText(html, words = 12){
-    const tmp = html.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<\/?[^>]+(>|$)/g, ' ');
-    return tmp.split(/\s+/).filter(Boolean).slice(0,words).join(' ') + (tmp.split(/\s+/).length > words ? '...' : '');
-  }
-
-  // fav icon helper (Google's s2 service)
-  function faviconFor(url){
-    try{ const hostname = domainFromUrl(url); return 'https://www.google.com/s2/favicons?sz=64&domain=' + encodeURIComponent(hostname); }catch(e){ return ''; }
-  }
-
-  // wire UI
-  goBtn.addEventListener('click', ()=> doSearch(qInput.value));
-  qInput.addEventListener('keydown', (e)=> { if(e.key === 'Enter') doSearch(qInput.value); });
-
   // initial focus
-  setTimeout(()=> qInput.focus(),300);
-
-  // End of module
+  setTimeout(()=> qInput.focus(), 250);
   </script>
 </body>
 </html>
