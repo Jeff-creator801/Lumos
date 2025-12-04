@@ -1,29 +1,46 @@
-n = int(input())
+import math
 
-# Считываем объекты и сохраняем их порядок
-objects = []
-for _ in range(n):
-    obj = input().strip()
-    objects.append(obj)
-
-# Создаем словарь для быстрого поиска индекса объекта
-index_map = {obj: i for i, obj in enumerate(objects)}
-
-q = int(input())
-
-results = []
-
-# Обрабатываем запросы
-for _ in range(q):
-    query = input().strip()
-    idx = index_map[query]
+def solve():
+    try:
+        a, b, c = map(float, input().split())
+    except:
+        # Если ввод некорректный, выводим нули
+        print("0 0 0 0")
+        return
     
-    # Создаем one-hot вектор
-    vector = ['0'] * n
-    vector[idx] = '1'
+    # Проверяем существование квадратного корня
+    # Ищем матрицу X = [[x11, x12], [0, x22]], так как A имеет вид [[a, b], [0, c]]
+    # Тогда X² = [[x11², x11*x12 + x12*x22], [0, x22²]] = [[a, b], [0, c]]
     
-    results.append(' '.join(vector))
+    # Из X² = A получаем уравнения:
+    # 1) x11² = a
+    # 2) x22² = c
+    # 3) x11*x12 + x12*x22 = b  =>  x12*(x11 + x22) = b
+    
+    # Для существования решения нужно, чтобы a >= 0 и c >= 0
+    # и (x11 + x22) ≠ 0, если b ≠ 0
+    
+    if a < 0 or c < 0:
+        print("0 0 0 0")
+        return
+    
+    x11 = math.sqrt(a)
+    x22 = math.sqrt(c)
+    
+    # Проверяем случай, когда x11 + x22 = 0
+    if abs(x11 + x22) < 1e-12:
+        # Если x11 + x22 = 0, то из третьего уравнения следует b = 0
+        if abs(b) < 1e-12:
+            x12 = 0.0  # Любое значение подойдет, берем 0
+            print(f"{x11:.12f} {x12:.12f} 0.0 {x22:.12f}")
+        else:
+            print("0 0 0 0")
+        return
+    
+    x12 = b / (x11 + x22)
+    
+    # Выводим результат с достаточной точностью
+    print(f"{x11:.12f} {x12:.12f} 0.0 {x22:.12f}")
 
-# Выводим результаты
-for result in results:
-    print(result)
+if __name__ == "__main__":
+    solve()
