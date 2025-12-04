@@ -1,46 +1,73 @@
-import math
-
 def solve():
-    try:
-        a, b, c = map(float, input().split())
-    except:
-        # Если ввод некорректный, выводим нули
-        print("0 0 0 0")
-        return
+    n = int(input())
     
-    # Проверяем существование квадратного корня
-    # Ищем матрицу X = [[x11, x12], [0, x22]], так как A имеет вид [[a, b], [0, c]]
-    # Тогда X² = [[x11², x11*x12 + x12*x22], [0, x22²]] = [[a, b], [0, c]]
+    # Исходное состояние
+    in_city = True          # начинаем в населенном пункте
+    on_highway = False      # не на автомагистрали
+    limit = None            # текущее временное ограничение (None если нет)
     
-    # Из X² = A получаем уравнения:
-    # 1) x11² = a
-    # 2) x22² = c
-    # 3) x11*x12 + x12*x22 = b  =>  x12*(x11 + x22) = b
+    # Ограничения по умолчанию
+    CITY_DEFAULT = 60
+    NON_CITY_DEFAULT = 90
+    HIGHWAY_DEFAULT = 110
     
-    # Для существования решения нужно, чтобы a >= 0 и c >= 0
-    # и (x11 + x22) ≠ 0, если b ≠ 0
+    results = []
     
-    if a < 0 or c < 0:
-        print("0 0 0 0")
-        return
-    
-    x11 = math.sqrt(a)
-    x22 = math.sqrt(c)
-    
-    # Проверяем случай, когда x11 + x22 = 0
-    if abs(x11 + x22) < 1e-12:
-        # Если x11 + x22 = 0, то из третьего уравнения следует b = 0
-        if abs(b) < 1e-12:
-            x12 = 0.0  # Любое значение подойдет, берем 0
-            print(f"{x11:.12f} {x12:.12f} 0.0 {x22:.12f}")
+    for _ in range(n):
+        event = input().strip().split()
+        event_type = event[0]
+        
+        # Обрабатываем события
+        if event_type == "city":
+            # Начало населенного пункта
+            in_city = True
+            on_highway = False
+            limit = None  # сбрасываем временное ограничение
+            
+        elif event_type == "nocity":
+            # Конец населенного пункта
+            in_city = False
+            limit = None  # сбрасываем временное ограничение
+            
+        elif event_type == "highway":
+            # Начало автомагистрали
+            on_highway = True
+            limit = None  # сбрасываем временное ограничение
+            
+        elif event_type == "nohighway":
+            # Конец автомагистрали
+            on_highway = False
+            limit = None  # сбрасываем временное ограничение
+            
+        elif event_type == "limit":
+            # Временное ограничение скорости
+            limit = int(event[1])
+            
+        elif event_type == "nolimit":
+            # Отмена временного ограничения
+            limit = None
+            
+        elif event_type == "cross":
+            # Перекресток
+            limit = None  # сбрасываем временное ограничение
+        
+        # Определяем текущую максимальную скорость
+        if limit is not None:
+            # Если есть временное ограничение
+            current_speed = limit
         else:
-            print("0 0 0 0")
-        return
+            # Используем ограничение по умолчанию
+            if on_highway:
+                current_speed = HIGHWAY_DEFAULT
+            elif in_city:
+                current_speed = CITY_DEFAULT
+            else:
+                current_speed = NON_CITY_DEFAULT
+        
+        results.append(str(current_speed))
     
-    x12 = b / (x11 + x22)
-    
-    # Выводим результат с достаточной точностью
-    print(f"{x11:.12f} {x12:.12f} 0.0 {x22:.12f}")
+    # Выводим результаты
+    print("\n".join(results))
 
 if __name__ == "__main__":
     solve()
