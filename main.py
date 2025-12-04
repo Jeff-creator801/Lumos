@@ -1,73 +1,86 @@
 def solve():
     n = int(input())
+    m = int(input())
+    A = int(input())
+    B = int(input())
+    C = int(input())
+    D = int(input())
+
+    # Пассажиры: A*i + B, i = 0..n-1
+    # Таксисты: C*j + D, j = 0..m-1
     
-    # Исходное состояние
-    in_city = True          # начинаем в населенном пункте
-    on_highway = False      # не на автомагистрали
-    limit = None            # текущее временное ограничение (None если нет)
+    # P(X) = количество пассажиров с A*i + B >= X
+    # P(X) = n - ceil(max(0, X - B)/A) если X > B, иначе n
+    # T(X) = количество таксистов с C*j + D <= X
+    # T(X) = min(m, floor((X - D)/C) + 1) если X >= D, иначе 0
     
-    # Ограничения по умолчанию
-    CITY_DEFAULT = 60
-    NON_CITY_DEFAULT = 90
-    HIGHWAY_DEFAULT = 110
+    def P(X):
+        if X > A*(n-1) + B:
+            return 0
+        if X <= B:
+            return n
+        # X > B
+        # i >= (X - B) / A
+        min_i = (X - B + A - 1) // A  # ceil
+        if min_i < 0:
+            return n
+        return max(0, n - min_i)
     
-    results = []
+    def T(X):
+        if X < D:
+            return 0
+        # j <= (X - D) / C
+        max_j = (X - D) // C
+        if max_j < 0:
+            return 0
+        return min(m, max_j + 1)
     
-    for _ in range(n):
-        event = input().strip().split()
-        event_type = event[0]
-        
-        # Обрабатываем события
-        if event_type == "city":
-            # Начало населенного пункта
-            in_city = True
-            on_highway = False
-            limit = None  # сбрасываем временное ограничение
-            
-        elif event_type == "nocity":
-            # Конец населенного пункта
-            in_city = False
-            limit = None  # сбрасываем временное ограничение
-            
-        elif event_type == "highway":
-            # Начало автомагистрали
-            on_highway = True
-            limit = None  # сбрасываем временное ограничение
-            
-        elif event_type == "nohighway":
-            # Конец автомагистрали
-            on_highway = False
-            limit = None  # сбрасываем временное ограничение
-            
-        elif event_type == "limit":
-            # Временное ограничение скорости
-            limit = int(event[1])
-            
-        elif event_type == "nolimit":
-            # Отмена временного ограничения
-            limit = None
-            
-        elif event_type == "cross":
-            # Перекресток
-            limit = None  # сбрасываем временное ограничение
-        
-        # Определяем текущую максимальную скорость
-        if limit is not None:
-            # Если есть временное ограничение
-            current_speed = limit
-        else:
-            # Используем ограничение по умолчанию
-            if on_highway:
-                current_speed = HIGHWAY_DEFAULT
-            elif in_city:
-                current_speed = CITY_DEFAULT
-            else:
-                current_speed = NON_CITY_DEFAULT
-        
-        results.append(str(current_speed))
+    # Бинарный поиск X, где P(X) >= T(X) и P(X+1) < T(X+1) ? 
+    # Но проще: перебираем X среди "критических" точек:
+    # Критические для P: X = A*i + B + 1 (граница, где пассажир i перестает платить)
+    # Критические для T: X = C*j + D (граница, где таксист j начинает работать)
     
-    # Выводим результаты
-    print("\n".join(results))
+    candidates = set()
+    # Границы для X
+    low = D
+    high = A*(n-1) + B
+    
+    # Критические точки:
+    for i in range(n):
+        candidates.add(max(D, A*i + B))       # максимальная цена для пассажира i
+        candidates.add(min(high, A*i + B + 1)) # на 1 больше — он уже не может
+    for j in range(m):
+        candidates.add(max(D, C*j + D))       # минимальная цена для таксиста j
+        candidates.add(min(high, C*j + D + 1)) # на 1 больше — ещё может
+    
+    # Добавляем low и high
+    candidates.add(low)
+    candidates.add(high)
+    
+    # Удалим слишком большие/маленькие
+    candidates = [x for x in candidates if D <= x <= high]
+    
+    # Ищем оптимальный
+    best_match = -1
+    best_X = -1
+    
+    for X in candidates:
+        matches = min(P(X), T(X))
+        if matches > best_match or (matches == best_match and X > best_X):
+            best_match = matches
+            best_X = X
+    
+    # Проверим X-1 и X+1 для safety
+    for dx in [-1, 1]:
+        X = best_X + dx
+        if X < D or X > high:
+            continue
+        matches = min(P(X), T(X))
+        if matches > best_match or (matches == best_match and X > best_X):
+            best_match = matches
+            best_X = X
+    
+    print(best_X)
 
 if __name__ == "__main__":
     solve()
